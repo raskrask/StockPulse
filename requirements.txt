@@ -1,0 +1,7 @@
+yfinance
+pandas
+ta
+streamlit
+boto3
+
+tensorflow
