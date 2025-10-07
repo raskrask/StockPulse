@@ -1,0 +1,6 @@
+# StockPulse config
+data_dir: "./data"
+use_s3: false
+s3_bucket: "your-bucket-name"
+line_notify_token: "YOUR_LINE_TOKEN"
+
