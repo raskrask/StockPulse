@@ -1,7 +1,10 @@
 yfinance
 pandas
+pandas_datareader
+plotly
 ta
+TA-Lib
 streamlit
 boto3
-
+scikit-learn
 tensorflow

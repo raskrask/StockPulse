@@ -3,28 +3,70 @@
 株式のテクニカル分析による自動スクリーニング・通知・投資成績可視化システム
 
 ## 機能
-- 毎日自動で日本株・米国株をスクリーニング
-- LINE Notifyで候補銘柄・売りシグナル通知
-- Streamlitダッシュボードで投資成績・保有銘柄・損益曲線を可視化
-- ポジション管理（Trades履歴から自動計算）
-- データ保存はローカルCSV/JSONまたはS3
+- **市場動向**  
+  - S&P500、NASDAQ100、日経平均、米国10年債、日本国債10年債（取得できない場合はUSD/JPY）を表示  
+  - 各市場のトレンド判定（Uptrend/Downtrend/Neutral）と自動コメント（リスクオン/オフ判定）
+- **スクリーニング**  
+  - テクニカル指標＋市場環境で候補銘柄を抽出
+- **通知**  
+  - LINE Notify に候補銘柄・売りシグナルを配信
+- **投資成績管理**  
+  - `Trades` をもとに自動集計  
+  - 損益曲線、勝率、Profit Factor、最大ドローダウンを可視化
+- **データ管理**  
+  - OHLCV、シグナル、ポジション、集計結果を日付ごとに保存（ローカル or S3）
+
+## 分析方針
+
+- **短期分析（個別銘柄）**  
+  - 日足データを使用  
+  - おおよそ1〜2ヶ月の値動きを対象とし、10~15日の短期的な価格上昇（15~20%）を狙う
+  - 出来高や移動平均線を参考に、トレンド転換の初動を検知する  
+
+- **中期分析（市場全体）**  
+  - 週足データを用いて約13週（おおよそ四半期）のトレンドを確認  
+  - 市場全体が右肩上がりの状況を基準に、銘柄選定の信頼性を補強する  
+  - 強気の買いシグナルを捉えることで、1~2ヶ月の急激な価格上昇（30~50%）を狙う
+
+- **長期分析（市場環境）**  
+  - 月足データを用いて直近12ヶ月の流れを評価  
+  - 長期的に右肩上がりを維持しているかをチェックし、相場全体の追い風・向かい風を判断する  
+
+## データキャッシュ設計
+
+### 基本方針
+- データは Yahoo Finance (yfinance) から取得
+- ただし、毎回全期間を取得すると時間がかかり、Yahoo側の負荷も大きい
+- そのため 過去分はS3にキャッシュし、直近分だけYahooから取得する
+
+### 保存単位
+- **日足**  
+  - 先月以前は S3 に月単位で保存  
+    - 例: `s3://stockpulse-cache/japan/7203.T/daily/2025-09.parquet`
+  - 今月分は Yahoo から毎回取得（数十営業日程度の範囲）  
+- **週足**  
+  - 本数が少ないため、全期間を1ファイルに保存  
+    - 例: `s3://stockpulse-cache/japan/7203.T/weekly.parquet`
+- **月足**  
+  - 本数が少ないため、全期間を1ファイルに保存  
+    - 例: `s3://stockpulse-cache/japan/7203.T/monthly.parquet`
 
 ## セットアップ
-1. `requirements.txt`のパッケージをインストール
-2. `streamlit run dashboard/app.py` でダッシュボード起動
+
+### Docker環境
+```sh
+docker-compose build && docker-compose up -d
+docker-compose exec stockpulse bash
+docker-compose logs -f stockpulse
+```
+http://localhost:8501/
 
 ## ディレクトリ構成（例）
 - src/ : データ取得・分析・通知ロジック
-- dashboard/ : Streamlitアプリ
-- data/ : ローカルデータ保存
+- pages/ : Streamlitアプリ
+- cache/ : ローカルデータ保存
 - trades.csv : 売買履歴
 
-## 必要パッケージ
-- yfinance
-- pandas
-- pandas-ta
-- streamlit
-- boto3
 
 ---
 詳細はcopilot-instructions.md参照
