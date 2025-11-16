@@ -67,3 +67,12 @@ def is_upward(series: pd.Series, lookback: int, threshold: float = 0) -> bool:
     """
     slope = trend_slope(series, lookback)
     return slope > threshold
+
+def is_downward(series: pd.Series, lookback: int, threshold: float = 0) -> bool:
+    """
+    傾きが threshold より小さければ「右肩下がり」と判定
+    - lookback=13 → 13週（週足）
+    - lookback=12 → 12ヶ月（月足）
+    """
+    slope = trend_slope(series, lookback)
+    return slope < threshold

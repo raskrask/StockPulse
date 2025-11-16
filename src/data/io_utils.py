@@ -18,6 +18,18 @@ s3 = boto3.client("s3", region_name=S3_REGION)
 
 
 # ---------- 保存系 ----------
+def save_contents(buffer: bytes, path: str):
+    """
+    バイト列をS3またはローカルに保存
+    """
+    if STORAGE_BACKEND.startswith("s3"):
+        bucket, key = _split_s3_path(path)
+        s3.put_object(Bucket=bucket, Key=key, Body=buffer)
+    else:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as f:
+            f.write(buffer)
+
 def save_parquet(df: pd.DataFrame, path: str):
     """
     DataFrameをS3またはローカルに保存

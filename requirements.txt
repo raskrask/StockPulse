@@ -8,3 +8,5 @@ streamlit
 boto3
 scikit-learn
 tensorflow
+bs4
+xlrd
