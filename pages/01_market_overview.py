@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from data.fetcher import fetch_yf_daily
+from data.yf_fetcher import fetch_yf_daily
 from analysis.regimes.trend import add_trend, trend_status, is_upward, is_downward
 from ui import market_card
 

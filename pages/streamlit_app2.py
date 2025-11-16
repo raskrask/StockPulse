@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from data.fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly
+from data.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
 from data.jpx_fetcher import JPXListingFetcher
 
 # st.set_page_config(page_title="StockPulse Test", layout="wide")
@@ -22,6 +22,9 @@ for row_index in range(sheet.nrows):
         st.write("市場:", row[3])
         st.write("業種:", row[7])
         st.write("規模:", row[9])
+
+info = fetch_yf_info(symbol)
+st.write("時価総額", "{:,}".format(info['marketCap']))
 
 @st.cache_data(ttl=3600)
 def fetch_yf_cache(mode: str, symbol: str, start: datetime):

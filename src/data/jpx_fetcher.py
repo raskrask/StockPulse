@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import datetime
 import os
 from typing import Optional
-from .io_utils import BASE_DIR, save_contents
+from .io_utils import BASE_DIR, save_contents, exists_file
 #import openpyxl
 import xlrd
 
@@ -52,15 +52,14 @@ class JPXListingFetcher:
 
         return today >= third_bd
 
-    def fetch_workbook(self) -> Optional[str]:
+    def fetch_workbook(self) -> Optional[xlrd.book.Book] :
         """Download the latest JPX listing Excel if needed."""
         
         # 月ごとのファイル名
         filepath = self._get_filename()
 
         # すでに存在する場合
-        if os.path.exists(filepath):
-            print(f"[JPX] Already exists: {filepath}")
+        if exists_file(filepath):
             return xlrd.open_workbook(filepath)
 
         print("[JPX] Fetch start...")
