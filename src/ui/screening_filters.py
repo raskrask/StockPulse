@@ -31,4 +31,33 @@ def screening_filters():
         value=(40, 60),
         step=10,
     )
+    filters["price_change_20d_ago"] = st.sidebar.slider(
+        "株価騰落率(%)[20日間前]",
+        min_value=-50,
+        max_value=50,
+        value=(-5, 5),
+        step=1,
+    )
+    filters["sma_25_divergence"] = st.sidebar.slider(
+        "25日移動平均線乖離率(%)",
+        min_value=-50,
+        max_value=50,
+        value=(-5, 5),
+        step=1,
+    )
+    filters["ytd_high_divergence"] = st.sidebar.slider(
+        "年初来高値からの下落率(%)",
+        min_value=-50,
+        max_value=0,
+        value=(-20, -5),
+        step=1,
+    )
+    filters["ytd_low_divergence"] = st.sidebar.slider(
+        "年初来安値からの上昇率(%)",
+        min_value=0,
+        max_value=9999,
+        value=(25, 9999),
+        step=1,
+    )
+
     return filters

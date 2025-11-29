@@ -61,6 +61,48 @@ def fetch_yf_info(symbol: str) -> dict:
     save_json(info, filename)
     return info
 
+
+# ------------------------------------------------------------
+# get_calendar
+# ------------------------------------------------------------
+def fetch_yf_calendar(symbol: str) -> dict:
+    """
+    銘柄情報を取得
+    """
+    month = datetime.today().strftime("%Y%m")
+    filename = f"{BASE_DIR}/{symbol}/calendar/{month}.json"
+    if exists_file(filename):
+        return load_json(filename)
+
+    ticker = yf.Ticker(symbol)
+    calendar = ticker.get_calendar()
+    #save_json(calendar, filename)
+
+    return calendar
+
+
+# ------------------------------------------------------------
+# get_earnings_dates
+# ------------------------------------------------------------
+def fetch_yf_earnings(symbol: str) -> dict:
+    """
+    銘柄情報を取得
+    """
+    month = datetime.today().strftime("%Y%m")
+    filename = f"{BASE_DIR}/{symbol}/earnings/{month}.parquet"
+    if exists_file(filename):
+        return load_parquet(filename)
+
+    try:
+        ticker = yf.Ticker(symbol)
+        earnings = ticker.get_earnings_dates(limit=60)
+        earnings = earnings.reset_index().rename(columns={"Earnings Date": "date"})
+        save_parquet(earnings, filename)
+    except Exception:
+        earnings = pd.DataFrame()
+    return earnings
+
+
 # ------------------------------------------------------------
 # 日足
 # ------------------------------------------------------------
