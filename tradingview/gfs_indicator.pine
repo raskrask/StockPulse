@@ -1,0 +1,50 @@
+//@version=6
+indicator(title="GFS テクニカル分析", shorttitle="GFS", overlay=true)//, timeframe="", timeframe_gaps=true)
+debug = table.new(position=position.bottom_right, columns = 1, rows = 10, border_width=1)
+table.cell(debug, 0, 0, ">>>"+str.tostring(close))
+
+// --- 移動平均線 ---
+sma_5 = ta.sma(close, 5)
+sma_25 = ta.sma(close, 25)
+sma_75 = ta.sma(close, 75)
+
+weelly_close = request.security(syminfo.tickerid, "W", close)
+weekly_sma_5 = ta.sma(weelly_close, 5)
+
+// SMA5 が SMA25|75より上昇で　長期右肩上がり
+trend_up = (sma_5 > sma_25) and (sma_5 > sma_75) and (sma_75 >= sma_75[1])
+bgcolor(trend_up ? color.new(color.red, 95) : na)
+
+plot(sma_5, color=color.red, title="SMA5")
+plot(sma_25, color=color.blue, title="SMA25")
+plot(sma_75, color=color.green, title="SMA75")
+
+// ローソクの条件
+bull_break = (close > open) and (close > sma_5) and (close[1] <= sma_5[1])  // 陽線 SMA5 上抜け
+bear_below = (close < open) and (close < sma_5) and (close[1] >= sma_5[1])  // 陰線 SMA5 下抜け
+
+// --- ローソクの色変更 ---
+barcolor(bull_break ? color.new(color.yellow, 0) : na, title = "陽線 SMA5 上抜け")
+barcolor(bear_below ? color.new(color.lime, 0) : na, title = "陰線 SMA5 下抜け")
+
+
+// --- 出来高 ---
+vol_window = 75
+max_vol = ta.highest(volume, vol_window)
+avg_vol = ta.sma(volume, vol_window)
+
+is_peak_vol = ((volume - avg_vol) / (max_vol - avg_vol)) >= 0.9
+//plotshape(is_peak_vol, style=shape.triangleup, location=location.belowbar, color=color.orange, size=size.small)
+
+peak_since = ta.barssince(is_peak_vol)
+box_width = (barstate.islast and peak_since < vol_window) ? peak_since : vol_window
+recent_peak = peak_since < box_width
+
+is_box_break = false
+if is_peak_vol[box_width] 
+	box.new(left = bar_index,right = bar_index - box_width, top = high[box_width], bottom = (high[box_width] + low[box_width]) / 2, bgcolor = color.new(color.red, 80), border_color = color.new(color.red, 50)) 
+	box.new(left = bar_index,right = bar_index - box_width, top = (high[box_width] + low[box_width]) / 2, bottom =low[box_width], bgcolor = color.new(color.green, 80), border_color = color.new(color.green, 50))
+if peak_since <= box_width
+	is_box_break := (close > open) and (close >= high[peak_since]) and trend_up
+
+barcolor(is_box_break ? color.new(color.maroon, 0) : na, title = "陽線 ヨコヨコ突破 上抜け")

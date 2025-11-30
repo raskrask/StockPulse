@@ -8,8 +8,12 @@ import yfinance as yf
 from datetime import datetime, timedelta
 
 from data.io_utils import (
+    BASE_DIR,
     load_parquet,
+    load_json,
     save_parquet,
+    save_json,
+    exists_file,
     get_daily_cache_path,
     get_weekly_cache_path,
     get_monthly_cache_path,
@@ -41,10 +45,69 @@ def _normalize_yf(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # ------------------------------------------------------------
+# get_info
+# ------------------------------------------------------------
+def fetch_yf_info(symbol: str) -> dict:
+    """
+    銘柄情報を取得
+    """
+    month = datetime.today().strftime("%Y%m")
+    filename = f"{BASE_DIR}/{symbol}/info/{month}.json"
+    if exists_file(filename):
+        return load_json(filename)
+
+    ticker = yf.Ticker(symbol)
+    info = ticker.info
+    save_json(info, filename)
+    return info
+
+
+# ------------------------------------------------------------
+# get_calendar
+# ------------------------------------------------------------
+def fetch_yf_calendar(symbol: str) -> dict:
+    """
+    銘柄情報を取得
+    """
+    month = datetime.today().strftime("%Y%m")
+    filename = f"{BASE_DIR}/{symbol}/calendar/{month}.json"
+    if exists_file(filename):
+        return load_json(filename)
+
+    ticker = yf.Ticker(symbol)
+    calendar = ticker.get_calendar()
+    #save_json(calendar, filename)
+
+    return calendar
+
+
+# ------------------------------------------------------------
+# get_earnings_dates
+# ------------------------------------------------------------
+def fetch_yf_earnings(symbol: str) -> dict:
+    """
+    銘柄情報を取得
+    """
+    month = datetime.today().strftime("%Y%m")
+    filename = f"{BASE_DIR}/{symbol}/earnings/{month}.parquet"
+    if exists_file(filename):
+        return load_parquet(filename)
+
+    try:
+        ticker = yf.Ticker(symbol)
+        earnings = ticker.get_earnings_dates(limit=60)
+        earnings = earnings.reset_index().rename(columns={"Earnings Date": "date"})
+        save_parquet(earnings, filename)
+    except Exception:
+        earnings = pd.DataFrame()
+    return earnings
+
+
+# ------------------------------------------------------------
 # 日足
 # ------------------------------------------------------------
 def fetch_yf_daily(
-    symbol: str, start: datetime, end: datetime | None = None
+    symbol: str, start: datetime, end: datetime | None = None, recently_cached: bool = True
 ) -> pd.DataFrame:
     """
     日足データを取得
@@ -61,24 +124,35 @@ def fetch_yf_daily(
     for month in pd.date_range(start=start, end=end, freq="ME"):
         if month.month == end.month and month.year == end.year:
             continue
-        path = get_daily_cache_path(symbol, month)
+        path = get_daily_cache_path(symbol, month, False)
         df_cached = load_parquet(path)
-        if df_cached is not None:
-            dfs.append(df_cached)
+        if df_cached is None:
+            dfs = None
+            break
+        dfs.append(df_cached)
 
     if dfs:
-        # 今月分をYahooから取得
         start_of_month = end.replace(day=1)
-        df_yahoo = yf.download(
-            symbol,
-            start=start_of_month,
-            end=end + timedelta(days=1),
-            progress=False,
-            auto_adjust=True,
-        )
-        if not df_yahoo.empty:
-            df_yahoo = _normalize_yf(df_yahoo)
-            dfs.append(df_yahoo)
+        path = get_daily_cache_path(symbol, end, True)
+        df_cached = None
+        if recently_cached: 
+            df_cached = load_parquet(path)
+
+        if df_cached is not None:
+            dfs.append(df_cached)
+        else:
+            # 今月分をYahooから取得
+            df_yahoo = yf.download(
+                symbol,
+                start=start_of_month,
+                end=end + timedelta(days=1),
+                progress=False,
+                auto_adjust=True,
+            )
+            if not df_yahoo.empty:
+                df_yahoo = _normalize_yf(df_yahoo)
+                dfs.append(df_yahoo)
+                save_parquet(df_yahoo, path)
 
         df = pd.concat(dfs, ignore_index=True)
         df = df.drop_duplicates(subset="date").sort_values("date")

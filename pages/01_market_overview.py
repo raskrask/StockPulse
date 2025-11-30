@@ -1,8 +1,8 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from data.fetcher import fetch_yf_daily
-from analysis.regimes.trend import add_trend, trend_status, is_upward
+from data.yf_fetcher import fetch_yf_daily
+from analysis.regimes.trend import add_trend, trend_status, is_upward, is_downward
 from ui import market_card
 
 
@@ -47,6 +47,9 @@ for i, (name, symbol) in enumerate(indices.items()):
         upward_12m = is_upward(
             df["close"], lookback=252, threshold=0.2
         )  # 日足252営業日 ≒ 12ヶ月
+        downward_13w = is_downward(
+            df["close"], lookback=65, threshold=-0.001
+        )  # 日足65営業日 ≒ 13週
 
         # 状態コメント
         if upward_13w and upward_12m:
@@ -55,8 +58,10 @@ for i, (name, symbol) in enumerate(indices.items()):
             comment = "中期は右肩上がり、長期は不明 ⚠️"
         elif upward_12m:
             comment = "長期は右肩上がり、中期は不明 ⚠️"
+        elif downward_13w:
+            comment = "長期・中期ともに右肩下がり ❌"
         else:
-            comment = "方向感なし ❌"
+            comment = "方向感なし ➖"
 
         market_card(
             title=name,

@@ -1,0 +1,25 @@
+//@version=6
+indicator("NASDAQ 5% Rebuy Signal", shorttitle="NDQ 5% Rebuy", overlay=true)
+// 直近高値から5%ダウンをシグナル
+
+// === 設定 ===
+length = input.int(100, "高値の探索期間")
+drop_pct = input.float(5.0, "ドロップ閾値(%)")
+
+// === 高値と現在価格 ===
+top_price = ta.highest(high, length)
+drawdown_pct = (top_price - close) / top_price * 100
+
+// === 条件: トップから5%以上下落 ===
+rebuy_signal = drawdown_pct >= drop_pct
+
+// === チャート表示 ===
+plot(drawdown_pct, title="下落率(%)", color=color.new(color.orange, 0))
+hline(drop_pct, "5%ライン", color=color.new(color.red, 0))
+
+plotshape(rebuy_signal, title="追加購入シグナル", style=shape.triangleup, 
+     location=location.belowbar, color=color.new(color.lime, 0), size=size.large, text="BUY")
+
+// === アラート条件 ===
+alertcondition(rebuy_signal, title="Rebuy Signal Triggered", 
+     message="NASDAQが直近高値から5%以上下落しました。追加購入検討。")
