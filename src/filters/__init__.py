@@ -6,6 +6,8 @@ from .rsi_filter import RsiFilter
 from .sma_filter import SmaFilter
 from .ytd_divergence_filter import YtdDivergenceFilter
 from .price_change_filter import PriceChangeFilter
+from .ichimoku_filter import IchimokuFilter
 
 
-__all__ = ["StockRecord", "BasicMarketFilter", "MarketCapFilter", "AvgTradingValueFilter", "RsiFilter", "SmaFilter", "YtdDivergenceFilter", "PriceChangeFilter"]
+__all__ = ["StockRecord", "BasicMarketFilter", "MarketCapFilter", "AvgTradingValueFilter", 
+           "RsiFilter", "SmaFilter", "YtdDivergenceFilter", "PriceChangeFilter", "IchimokuFilter"]

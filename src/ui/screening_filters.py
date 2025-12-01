@@ -8,6 +8,7 @@ def screening_filters():
     )
 
     filters = {}
+    filters["stockNumbers"] = st.sidebar.text_input("銘柄コード")
     filters["marketCap"] = st.sidebar.slider(
         "時価総額（百万円）",
         min_value=0,
@@ -58,6 +59,10 @@ def screening_filters():
         max_value=9999,
         value=(25, 9999),
         step=1,
+    )
+
+    filters["ichimoku_3yakukoten"] = st.sidebar.checkbox(
+        "一目均衡表 三役好転シグナル", value=False
     )
 
     return filters
