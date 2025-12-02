@@ -14,7 +14,8 @@ class ScreeningController:
 
         nrows = sheet.nrows
         candidates = list(range(nrows))[1:]
-        #candidates = candidates[0:560]  # テスト用に最初の300行だけ処理
+        params['stockNumbers'] = params.get('stockNumbers', '').strip()
+        #candidates = candidates[1040:2040]  # テスト用に最初の300行だけ処理
         filters = self._build_filters(params)
 
         with progress_container:
@@ -26,6 +27,9 @@ class ScreeningController:
             progress = (i + 1) / nrows
             with progress_container:
                 st.progress(progress, text=f"Processing {record.symbol}... ({i+1}/{nrows})")
+
+            if params['stockNumbers'] and record.symbol not in params['stockNumbers']:
+                continue
 
             combined_filter = lambda record: all(filter.apply(record) for filter in filters)
             if combined_filter(record):
@@ -41,6 +45,7 @@ class ScreeningController:
 
         with progress_container:
             st.progress(100, text=f"Finish Screening... {len(result)} stocks found.")
+
         return result
 
 
@@ -57,6 +62,8 @@ class ScreeningController:
             "sma_200_divergence": lambda key, v: SmaFilter(key, v, 200),
             "ytd_high_divergence": lambda key, v: YtdDivergenceFilter(key, v, "high"),
             "ytd_low_divergence": lambda key, v: YtdDivergenceFilter(key, v, "low"),
+            "ichimoku_3yakukoten": lambda key, v: IchimokuFilter(key, v),
+            "double_bottom_signal": lambda key, v: DoubleBottomFilter(key, v),
         }
 
         for key, builder in filterFactory.items():
