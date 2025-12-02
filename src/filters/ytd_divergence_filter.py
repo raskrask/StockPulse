@@ -6,6 +6,7 @@ import numpy as np
 class YtdDivergenceFilter(ScreeningFilter):
     """
     年初来（YTD）の高値・安値に対する上昇率／下落率フィルター
+    (1月から3月までは前年末からの乖離率を使用)
     """
 
     def __init__(self, key, divergence_range: list[float], type: str):
@@ -24,6 +25,8 @@ class YtdDivergenceFilter(ScreeningFilter):
         #    if target >= datetime.today():
         #        target = target - timedelta(days=90)
         target = datetime.today().replace(month=1, day=1)
+        if datetime.today().month <= 3:
+            target = target.replace(year=target.year - 1)
 
         df = fetch_yf_daily(record.symbol, target)
         if df.empty:

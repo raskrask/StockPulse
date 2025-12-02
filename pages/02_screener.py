@@ -14,4 +14,4 @@ if st.sidebar.button("スクリーニングを実行"):
         symbols = " ".join(s['symbol'] for s in screen_stocks)
         st.markdown(f"検索結果({len(screen_stocks)})件：`{symbols}`")
         df = pd.DataFrame(screen_stocks).set_index('symbol')
-        st.write(df)
+        st.write(screen_stocks)

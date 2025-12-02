@@ -45,9 +45,7 @@ class ScreeningController:
 
         with progress_container:
             st.progress(100, text=f"Finish Screening... {len(result)} stocks found.")
-            if result:
-                symbols = " ".join(s['symbol'] for s in result)
-                st.markdown(f"検索結果({len(result)})件：`{symbols}`")
+
         return result
 
 
@@ -65,6 +63,7 @@ class ScreeningController:
             "ytd_high_divergence": lambda key, v: YtdDivergenceFilter(key, v, "high"),
             "ytd_low_divergence": lambda key, v: YtdDivergenceFilter(key, v, "low"),
             "ichimoku_3yakukoten": lambda key, v: IchimokuFilter(key, v),
+            "double_bottom_signal": lambda key, v: DoubleBottomFilter(key, v),
         }
 
         for key, builder in filterFactory.items():

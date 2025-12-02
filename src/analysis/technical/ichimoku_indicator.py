@@ -1,7 +1,8 @@
+import pandas as pd
 
 class IchimokuIndicator:
     @staticmethod
-    def add_3yakukoten(df) -> bool:
+    def add_3yakukoten(df) -> pd.DataFrame:
         """
         三役好転＋ダブルボトムの判定
         1. 転換線 > 基準線（転換線が上）

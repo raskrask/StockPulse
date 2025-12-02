@@ -7,7 +7,9 @@ from .sma_filter import SmaFilter
 from .ytd_divergence_filter import YtdDivergenceFilter
 from .price_change_filter import PriceChangeFilter
 from .ichimoku_filter import IchimokuFilter
+from .double_bottom_filter import DoubleBottomFilter
 
 
 __all__ = ["StockRecord", "BasicMarketFilter", "MarketCapFilter", "AvgTradingValueFilter", 
-           "RsiFilter", "SmaFilter", "YtdDivergenceFilter", "PriceChangeFilter", "IchimokuFilter"]
+           "RsiFilter", "SmaFilter", "YtdDivergenceFilter", "PriceChangeFilter", 
+           "IchimokuFilter", "DoubleBottomFilter"]
