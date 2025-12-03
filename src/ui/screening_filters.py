@@ -1,11 +1,6 @@
 import streamlit as st
 
 def screening_filters():
-    st.sidebar.title("スクリーニング条件")
-
-    st.sidebar.caption(
-        "条件を設定し、スクリーニングを実行します。該当する銘柄リストが表示されます。"
-    )
 
     filters = {}
     filters["stockNumbers"] = st.sidebar.text_input("銘柄コード")

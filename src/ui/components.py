@@ -28,7 +28,7 @@ def market_card(title: str, value: float, trend: str, delta: float, comment: str
         showlegend=False,
     )
 
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 def metric_card(title: str, value: str, delta: str, trend: str):

@@ -3,6 +3,12 @@ import pandas as pd
 from ui import screening_filters
 from controller.screening_controller import ScreeningController
 
+st.sidebar.title("スクリーニング条件")
+
+st.sidebar.caption(
+    "条件を設定し、スクリーニングを実行します。該当する銘柄リストが表示されます。"
+)
+
 filters = screening_filters()
 
 if st.sidebar.button("スクリーニングを実行"):

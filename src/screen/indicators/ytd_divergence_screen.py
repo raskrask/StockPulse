@@ -1,9 +1,10 @@
-from .screening_filter import ScreeningFilter , StockRecord
+from screen.base_screen import BaseScreen
+from screen.screen_record import  ScreenRecord
 from data.yf_fetcher import fetch_yf_daily, fetch_yf_info
 from datetime import datetime, timedelta
 import numpy as np
 
-class YtdDivergenceFilter(ScreeningFilter):
+class YtdDivergenceScreen(BaseScreen):
     """
     年初来（YTD）の高値・安値に対する上昇率／下落率フィルター
     (1月から3月までは前年末からの乖離率を使用)
@@ -16,7 +17,7 @@ class YtdDivergenceFilter(ScreeningFilter):
         self.max_value = divergence_range[1]
         self.type = type
 
-    def apply(self, record: StockRecord) -> bool:
+    def apply(self, record: ScreenRecord) -> bool:
         # 暫定決算発表日取得(未来の場合には四半期強制的に戻す)
         #info = fetch_yf_info(record.symbol)
         #target = datetime.fromtimestamp( info['earningsTimestampEnd'] )
@@ -47,7 +48,33 @@ class YtdDivergenceFilter(ScreeningFilter):
             #ytd = df.iloc[0]["low"]
             ytd_div = (last - ytd) / ytd * 100
 
-        record.values[self.key] = [ytd_div, ytd, last, target, self.min_value, self.max_value]
+        record.values[self.key] = [ytd_div, ytd, last, self.min_value, self.max_value]
 
         # 乖離率（%）
         return self.min_value <= ytd_div <= self.max_value
+
+    def batch_apply(self, record: ScreenRecord, days: int) -> list[bool]:
+        df = record.recent_yf_yearly(days)
+        if df.empty:
+            return False
+
+        close = df["close"].astype(float).values
+
+        flags = []
+        for i in range(len(df)):
+            date = df.iloc[i]["date"]
+            year_start = date.replace(month=1, day=1)
+            if date.month <= 3:
+                year_start = year_start.replace(year=year_start.year - 1)
+            df_ytd = df[(df["date"] >= year_start) & (df["date"] <= date)]
+
+            if self.type == "high":
+                ytd = np.max(df_ytd["high"].astype(float).values)
+                ytd_div = (close[i] - ytd) / ytd * 100
+            else:
+                ytd = np.min(df_ytd["low"].astype(float).values)
+                ytd_div = (close[i] - ytd) / ytd * 100
+
+            flags.append( self.min_value <= ytd_div <= self.max_value )
+
+        return flags

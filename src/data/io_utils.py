@@ -47,6 +47,10 @@ def save_json(data: dict, path: str):
     """
     JsonデータをS3またはローカルに保存
     """
+    for k, v in data.items():
+        if isinstance(v, pd.Timestamp):
+            data[k] = v.isoformat()     # "2025-12-02T09:30:00"
+
     json_str = json.dumps(data).encode("utf-8")
     if STORAGE_BACKEND.startswith("s3"):
         bucket, key = _split_s3_path(path)
@@ -101,7 +105,11 @@ def load_json(path: str) -> dict | None:
             return json.load(obj["Body"])
         else:
             if os.path.exists(path):
-                return json.load(open(path, "r"))
+                data = json.load(open(path, "r"))
+                if 'date' in data:
+                    data['date'] = datetime.strptime(data['date'], "%Y-%m-%dT%H:%M:%S")
+                return data
+
     except Exception:
         return None
     return None
