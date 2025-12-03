@@ -1,9 +1,10 @@
-from .screening_filter import ScreeningFilter , StockRecord
+from screen.base_screen import BaseScreen
+from screen.screen_record import  ScreenRecord
 from data.yf_fetcher import fetch_yf_daily
 from datetime import datetime, timedelta
 import numpy as np
 
-class PriceChangeFilter(ScreeningFilter):
+class PriceChangeScreen(BaseScreen):
     """
     株価騰落率（N営業日前比）フィルター
     """
@@ -15,8 +16,7 @@ class PriceChangeFilter(ScreeningFilter):
         self.max_value = value_range[1]
         self.days = days
 
-    def apply(self, record: StockRecord) -> bool:
-
+    def apply(self, record: ScreenRecord) -> bool:
         df = record.recent_yf_yearly()
         if df.empty:
             return False
@@ -33,3 +33,21 @@ class PriceChangeFilter(ScreeningFilter):
         record.values[self.key] = [change, last, past, self.min_value, self.max_value   ]
 
         return self.min_value <= change <= self.max_value
+
+    def batch_apply(self, record: ScreenRecord, days: int) -> list[bool]:
+
+        df = record.recent_yf_yearly(days)
+        if df.empty:
+            return False
+        df = df.sort_index()
+        close = df["close"].astype(float).values
+
+        # 現在値と N営業日前の終値
+        past = df["close"].shift(-self.days).astype(float).values
+
+        # 騰落率（%）
+        # (現在値 - 過去値) / 過去値 × 100
+        change = (close - past) / past * 100
+        flags = [self.min_value <= v <= self.max_value for v in change]
+
+        return flags

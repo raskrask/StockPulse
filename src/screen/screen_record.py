@@ -3,7 +3,7 @@ from data.yf_fetcher import fetch_yf_daily
 from datetime import datetime, timedelta
 import xlrd
 
-class StockRecord:
+class ScreenRecord:
     def __init__(self, jpx: list[xlrd.sheet.Cell]):
         self.jpx = jpx
         self.symbol = str(jpx[1].value).split(".")[0] + ".T"  # 銘柄コード
@@ -33,20 +33,12 @@ class StockRecord:
         self.yf_daily = fetch_yf_daily(self.symbol, start)
         return self.yf_daily
 
-    def recent_yf_yearly(self):
-        if self.yf_yearly is not None:
-            return self.yf_yearly
+    def recent_yf_yearly(self, days=366):
+        if self.yf_yearly is not None and len(self.yf_yearly) >= days:
+            return self.yf_yearly[-days:]
 
-        start = datetime.today() - timedelta(days=366)
+        start = datetime.today() - timedelta(days=days)
         self.yf_yearly = fetch_yf_daily(self.symbol, start)
-        return self.yf_yearly
+        return self.yf_yearly[-days:]
 
-# フィルターの共通インターフェース
-class ScreeningFilter(ABC):
-    def __init__(self, key):
-        self.key = key
-
-    @abstractmethod
-    def apply(self, record: StockRecord) -> bool:
-        pass        
 
