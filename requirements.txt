@@ -10,3 +10,4 @@ scikit-learn
 tensorflow
 bs4
 xlrd
+dotenv
