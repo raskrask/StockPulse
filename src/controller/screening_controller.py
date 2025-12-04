@@ -1,12 +1,15 @@
 
 from data.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
+from typing import Callable, Iterable, List, Dict, Optional
 from data.jpx_fetcher import JPXListingFetcher
 from screen.screen_factory import ScreenFactory
 from screen.screen_record import  ScreenRecord
 import streamlit as st
 
+ProgressCallback = Callable[[float, str], None]  # (0.0〜1.0, メッセージ)
+
 class ScreeningController:
-    def screen_stocks(self, params: dict, progress_container = None) -> list:
+    def screen_stocks(self, params: dict, progress_callback: Optional[ProgressCallback] = None) -> list:
         """
         指定されたフィルター条件に基づいて銘柄をスクリーニングする
         """
@@ -19,15 +22,15 @@ class ScreeningController:
         candidates = candidates[1040:1140]  # テスト用に最初の300行だけ処理
         filters = ScreenFactory.build_screens(params)
 
-        with progress_container:
-            st.progress(0, text=f"Start screening...{nrows} stocks")
+        if progress_callback:
+            progress_callback(0, text=f"Start screening...{nrows} stocks")
 
         result = []
         for i, x in enumerate(candidates):
             record = ScreenRecord(sheet.row(x))
             progress = (i + 1) / nrows
-            with progress_container:
-                st.progress(progress, text=f"Processing {record.symbol}... ({i+1}/{nrows})")
+            if progress_callback:
+                progress_callback(progress, text=f"Processing {record.symbol}... ({i+1}/{nrows})")
 
             if params['stockNumbers'] and record.symbol not in params['stockNumbers']:
                 continue
@@ -44,8 +47,8 @@ class ScreeningController:
 
 
 
-        with progress_container:
-            st.progress(100, text=f"Finish Screening... {len(result)} stocks found.")
+        if progress_callback:
+            progress_callback(1.0, text=f"Finish Screening... {len(result)} stocks found.")
 
         return result
 
