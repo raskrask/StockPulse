@@ -1,5 +1,6 @@
 
 from data.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
+from typing import Callable, Iterable, List, Dict, Optional
 from data.jpx_fetcher import JPXListingFetcher
 from screen.screen_factory import ScreenFactory
 from screen.screen_record import  ScreenRecord
@@ -10,8 +11,10 @@ import streamlit as st
 import json
 from data.io_utils import BASE_DIR, load_json, save_json, exists_file
 
+ProgressCallback = Callable[[float, str], None]  # (0.0〜1.0, メッセージ)
+
 class BacktestController:
-    def execute_backtest(self, params: dict, progress_container = None) -> list:
+    def execute_backtest(self, params: dict, progress_callback: Optional[ProgressCallback] = None) -> list:
         """
         指定されたフィルター条件に基づいて銘柄をバックテストする
         """
@@ -25,17 +28,17 @@ class BacktestController:
         #candidates = candidates[1040:1250]  # テスト用に最初の300行だけ処理
         filters = ScreenFactory.build_screens(params)
 
-        with progress_container:
+        if progress_callback:
             start_time = datetime.now()
-            st.progress(0, text=f"Start generate_triggers...{nrows} stocks")
+            progress_callback(0, text=f"Start generate_triggers...{nrows} stocks")
 
         results = []
         for i, x in enumerate(candidates):
             record = ScreenRecord(sheet.row(x))
 
             progress = (i + 1) / nrows
-            with progress_container:
-                st.progress(progress, text=f"Processing generate_triggers{record.symbol}... ({i+1}/{nrows})")
+            if progress_callback:
+                progress_callback(progress, text=f"Processing generate_triggers{record.symbol}... ({i+1}/{nrows})")
 
             if params['stockNumbers'] and record.symbol not in params['stockNumbers']:
                 continue
@@ -53,14 +56,14 @@ class BacktestController:
                 })
                 #st.write(f"{record.symbol} trigger: {trigger}, strategy: {results[-1]}")
 
-        with progress_container:    
-            elapsed_time = datetime.now() - start_time
-            st.progress(100, text=f"Finish generate_triggers... {len(results)} stocks found. Time:{elapsed_time}")
+    
+        if progress_callback:
+            progress_callback(1.0, text=f"Completed in {datetime.now() - start_time}")
 
-        metrics = self._compute_backtest_metrics(results, params, progress_container)
+        metrics = self._compute_backtest_metrics(results, params=params)
         return metrics
 
-    def _compute_backtest_metrics(self, strategy: list, params: dict, progress_container) -> dict:
+    def _compute_backtest_metrics(self, strategy: list, params: dict) -> dict:
         """
         バックテストの結果から評価指標（勝率、PF、最大ドローダウンなど）を計算する
         """
