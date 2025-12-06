@@ -12,7 +12,7 @@ class RsiIndicator(BaseIndicator):
         self.max_value = value[1]
 
     def apply(self, record: StockRecord) -> bool:
-        df = record.recent_yf_monthly()
+        df = record.recent_yf_yearly()
         df.sort_index(inplace=True)
         target = datetime.today() - timedelta(days=14*2)
         period = len(df[df["date"] >= target]) # 休場日レコードを除いた期間
@@ -26,7 +26,7 @@ class RsiIndicator(BaseIndicator):
         rsi = talib.RSI(close, timeperiod=14)[-1]
         record.values[self.key] = [rsi, self.min_value, self.max_value]
 
-        return True or self.min_value <= rsi <= self.max_value
+        return self.min_value <= rsi <= self.max_value
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
         df = record.get_daily_chart_by_days(days+14)

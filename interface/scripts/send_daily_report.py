@@ -8,7 +8,16 @@ from application.daily_report_usecase import DailyReportUsecase
 def main():
 
     # 1. 買い時株レポート作成
-    report = DailyReportUsecase().generate_buy_signals()
+    signals = DailyReportUsecase().generate_buy_signals()
+    
+    report = "個別株レポート\n"
+    for s in signals:
+        report += f"[ {s['profile']['name']} ]\n"
+        for t in s['trigger']:
+            report += f"  {t['symbol']} {t['name']}\n"
+        if len(s['trigger']) == 0:
+            report += "該当銘柄なし\n"
+    print(report)
 
     # 2. LINEに送信
     notifier = LineNotifier()

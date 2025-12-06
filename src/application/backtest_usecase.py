@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 
 class BacktestUsecase:
-    def __init__(self, progress: ProgressReporter = NullProgressReporter(), use_cache=False):
+    def __init__(self, progress: ProgressReporter = NullProgressReporter(), use_cache=True):
         self.progress_reporter = progress
         self.use_cache = use_cache
         self.stock_repo = StockRepository()

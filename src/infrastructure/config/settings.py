@@ -1,5 +1,5 @@
 import os
-import config.environment
+from .environment import dotenv_path
 
 class BaseSettings:
     """共通設定"""

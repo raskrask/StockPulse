@@ -31,7 +31,8 @@ class DoubleBottom:
 
         signal = first_bottom <= second_bottom and \
                 right_peak >= neckline and \
-                df_terms["close"].iloc[-1] > neckline
+                df_terms["close"].iloc[-1] > neckline and \
+                df_terms["close"].iloc[-2] < neckline
     
         return {
             "signal": signal,

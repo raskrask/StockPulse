@@ -27,7 +27,7 @@ def save_contents(buffer: bytes, path: str):
         bucket, key = _split_s3_path(path)
         s3.put_object(Bucket=bucket, Key=key, Body=buffer)
     else:
-        path = os.path.join(BASE_DIR, path)
+        path = os.path.join(path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             f.write(buffer)
