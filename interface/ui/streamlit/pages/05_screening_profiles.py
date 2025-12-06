@@ -2,10 +2,9 @@ import streamlit as st
 from ui.streamlit.components import screening_filters, set_screening_params, StreamlitProgressReporter
 from application.screening_profile_usecase import ScreeningProfileUsecase
 
-service = ScreeningProfileUsecase()
-
 st.title("🔔 スクリーニング条件の保存")
 
+service = ScreeningProfileUsecase()
 profiles = service.list_profiles()
 selected = st.selectbox("プロファイルを選択", ["<新規>"] + profiles)
 

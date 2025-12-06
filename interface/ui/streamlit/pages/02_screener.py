@@ -1,13 +1,22 @@
 import streamlit as st
 import pandas as pd
-from ui.streamlit.components import screening_filters, StreamlitProgressReporter
+from ui.streamlit.components import screening_filters, set_screening_params, StreamlitProgressReporter
 from application.screening_usecase import ScreeningUsecase
+from application.screening_profile_usecase import ScreeningProfileUsecase
 
 st.sidebar.title("スクリーニング条件")
 
 st.sidebar.caption(
     "条件を設定し、スクリーニングを実行します。該当する銘柄リストが表示されます。"
 )
+
+service = ScreeningProfileUsecase()
+profiles = service.list_profiles()
+
+selected = st.sidebar.selectbox("プロファイルを選択", [""] + profiles)
+if st.sidebar.button("読込"):
+    data = service.load_profile(selected)
+    set_screening_params(data["filters"])
 
 filters = screening_filters(st.sidebar)
 
