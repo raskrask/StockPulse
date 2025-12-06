@@ -45,7 +45,7 @@ class JPXListingFetcher:
         filepath = io_utils.get_jpx_filename(self._is_third_business_day_passed())
 
         # すでに存在する場合
-        if io_utils.exists_file(filepath):
+        if os.path.exists(filepath):
             return xlrd.open_workbook(filepath)
 
         print("[JPX] Fetch start...")

@@ -9,7 +9,7 @@ st.sidebar.caption(
     "条件を設定し、スクリーニングを実行します。該当する銘柄リストが表示されます。"
 )
 
-filters = screening_filters()
+filters = screening_filters(st.sidebar)
 
 if st.sidebar.button("スクリーニングを実行"):
     st.success("スクリーニングが実行されました。該当する銘柄リストを表示します。")
