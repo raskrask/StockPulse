@@ -19,7 +19,7 @@ RUN apt-get update && \
     cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
 WORKDIR /app
-ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=/app/src:/app/interface/
 
 COPY requirements.txt ./
 RUN pip install --upgrade pip
@@ -28,4 +28,4 @@ RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
 
 COPY . .
 
-CMD ["streamlit", "run", "app.py"]
+CMD ["streamlit", "run", "interface/ui/streamlit/app.py"]
