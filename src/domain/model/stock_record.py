@@ -42,8 +42,7 @@ class StockRecord:
         approx_days = days * 2  # 休日を考慮したバッファ
 
         from_date = today - timedelta(days=approx_days)
-        to_date = today
-        df = self.repo.load_daily_range(self.symbol, from_date, to_date)
+        df = self.repo.load_daily_range(self.symbol, from_date, today)
 
         # 完全一致キャッシュを更新
         self._memory_cache_days = df

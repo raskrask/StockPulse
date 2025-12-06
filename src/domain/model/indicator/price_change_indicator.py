@@ -42,7 +42,7 @@ class PriceChangeIndicator(BaseIndicator):
         close = df["close"].astype(float).values
 
         # 現在値と N営業日前の終値
-        past = df["close"].shift(-self.days).astype(float).values
+        past = df["close"].shift(self.days).astype(float).values
 
         # 騰落率（%）
         # (現在値 - 過去値) / 過去値 × 100

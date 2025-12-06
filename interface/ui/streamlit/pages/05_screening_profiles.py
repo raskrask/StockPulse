@@ -16,7 +16,7 @@ if st.button("プロファイル読込み"):
     set_screening_params(data["filters"])
 
 # --- 編集フォーム ---
-name = st.text_input("プロファイル名", value="" if selected == "<新規>" else selected)
+data["name"] = st.text_input("プロファイル名", value="" if selected == "<新規>" else selected)
 data["notify"] = st.checkbox("通知を有効にする", value=data.get("notify", True))
 data["memo"]   = st.text_area("メモ", value=data.get("memo", ""))
 
@@ -26,8 +26,8 @@ data["filters"] = screening_filters(st)
 
 # 保存
 if st.button("保存する"):
-    if name:
-        service.save_profile(name, data)
-        st.success(f"{name} を保存しました！")
+    if data["name"]:
+        service.save_profile(data["name"], data)
+        st.success(f"{data['name']} を保存しました！")
     else:
         st.error("プロファイル名を入力してください。")

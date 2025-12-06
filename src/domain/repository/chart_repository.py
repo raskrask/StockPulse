@@ -30,7 +30,7 @@ class ChartRepository:
         dfs = cache_store.load_daily_month_between(symbol, from_date, to_date)
 
         # Step2: キャッシュで不足している範囲を検出
-        df_cached = pd.concat(dfs).sort_index() if dfs else pd.DataFrame()
+        df_cached = pd.concat(dfs, ignore_index=True).sort_index() if dfs else pd.DataFrame()
 
         missing_months = self._detect_missing_ranges(df_cached, from_date, to_date)
 
@@ -41,7 +41,7 @@ class ChartRepository:
             cache_store.save_daily_by_month(symbol, month, yahoo_df)
 
         # Step4: すべて結合して期間を切り取って返す
-        final = pd.concat(dfs).sort_index()
+        final = pd.concat(dfs, ignore_index=True).sort_index()
         final = final.drop_duplicates(subset="date").sort_values("date")
         mask = (final["date"] >= from_date) & (final["date"] <= to_date)
         return final.loc[mask]

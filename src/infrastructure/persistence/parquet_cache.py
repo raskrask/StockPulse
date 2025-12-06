@@ -20,7 +20,7 @@ def save_daily_by_month(symbol, month, df) -> list:
 
 def load_daily_month_between(symbol,from_date, to_date) -> list:
     results = []
-
+    from_date = from_date.replace(day=1)
     monthly_ranges = pd.date_range(start=from_date, end=to_date, freq="MS")
     for ym in monthly_ranges:
         if exists_daily_by_month(symbol, ym):
