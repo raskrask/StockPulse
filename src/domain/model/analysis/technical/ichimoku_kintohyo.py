@@ -1,6 +1,6 @@
 import pandas as pd
 
-class IchimokuIndicator:
+class IchimokuKintohyo:
     @staticmethod
     def add_3yakukoten(df) -> pd.DataFrame:
         """
@@ -28,6 +28,6 @@ class IchimokuIndicator:
         is_tenkan_above_kijun = tenkan_sen > kijun_sen
         is_chikou_above_price_26_periods_ago = (chikou_span > close).shift(26)
         is_above_kumo = (close > senkou_span_a) & (close > senkou_span_b)
-        df["ichiyaku_3yakukoten"] = is_tenkan_above_kijun & is_chikou_above_price_26_periods_ago & is_above_kumo
+        df["ichimoku_3yakukoten"] = is_tenkan_above_kijun & is_chikou_above_price_26_periods_ago & is_above_kumo
 
         return df

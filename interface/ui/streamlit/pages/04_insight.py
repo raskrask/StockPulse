@@ -1,28 +1,24 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from infrastructure.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
+from infrastructure.yahoo.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
+from domain.repository.stock_repository import StockRepository
 
-# st.set_page_config(page_title="StockPulse Test", layout="wide")
-# st.title("📊 StockPulse キャッシュテスト")
+st.set_page_config(page_title="StockPulse Insight", layout="wide")
+st.title("🔍 銘柄詳細")
 
 symbol = st.text_input("銘柄コードを入力 (例: 7203.T)", "7203.T")
+
+repo = StockRepository()
+record = repo.get_stock_by_symbol(symbol)
+
+st.write("銘柄名:", record.rawdata[2].value)
+st.write("市場:", record.rawdata[3].value)
+st.write("業種:", record.rawdata[7].value)
+st.write("規模:", record.rawdata[9].value)
+
 start = datetime.today() - timedelta(days=365)
-
-fetcher = JPXListingFetcher()
-workbook = fetcher.fetch_workbook()
-
-symbol_num = symbol.split(".")[0]
-sheet = workbook.sheet_by_index(0)
-for row_index in range(sheet.nrows):
-    row = sheet.row_values(row_index)
-    if str(row[1]).split(".")[0] == symbol_num:
-        st.write("銘柄名:", row[2])
-        st.write("市場:", row[3])
-        st.write("業種:", row[7])
-        st.write("規模:", row[9])
-
 info = fetch_yf_info(symbol)
 st.write("時価総額", "{:,}".format(info['marketCap']))
 

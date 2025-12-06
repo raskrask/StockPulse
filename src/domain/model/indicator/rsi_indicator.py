@@ -1,18 +1,17 @@
-from domain.model.base_screen import BaseScreen
-from domain.model.screen_record import  ScreenRecord
-from infrastructure.yf_fetcher import fetch_yf_daily
+from .base_indicator import BaseIndicator
+from domain.model.stock_record import  StockRecord
 from datetime import datetime, timedelta
 import pandas as pd
 import talib
 
-class RsiScreen(BaseScreen):
+class RsiIndicator(BaseIndicator):
 
     def __init__(self, key, value: list[int]):
         super().__init__(key)
         self.min_value = value[0]
         self.max_value = value[1]
 
-    def apply(self, record: ScreenRecord) -> bool:
+    def apply(self, record: StockRecord) -> bool:
         df = record.recent_yf_monthly()
         df.sort_index(inplace=True)
         target = datetime.today() - timedelta(days=14*2)
@@ -29,8 +28,8 @@ class RsiScreen(BaseScreen):
 
         return True or self.min_value <= rsi <= self.max_value
 
-    def batch_apply(self, record: ScreenRecord, days: int) -> list[bool]:
-        df = record.recent_yf_yearly(days)
+    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+        df = record.get_daily_chart_by_days(days+14)
         if df.empty:
             return False
 
@@ -38,4 +37,4 @@ class RsiScreen(BaseScreen):
         rsi = talib.RSI(close, timeperiod=14)
         flags = [self.min_value <= v <= self.max_value for v in rsi]
 
-        return flags
+        return flags[-days:]

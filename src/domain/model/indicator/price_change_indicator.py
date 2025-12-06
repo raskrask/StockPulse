@@ -1,10 +1,9 @@
-from domain.model.base_screen import BaseScreen
-from domain.model.screen_record import  ScreenRecord
-from infrastructure.yf_fetcher import fetch_yf_daily
+from .base_indicator import BaseIndicator
+from domain.model.stock_record import  StockRecord
 from datetime import datetime, timedelta
 import numpy as np
 
-class PriceChangeScreen(BaseScreen):
+class PriceChangeIndicator(BaseIndicator):
     """
     株価騰落率（N営業日前比）フィルター
     """
@@ -16,7 +15,7 @@ class PriceChangeScreen(BaseScreen):
         self.max_value = value_range[1]
         self.days = days
 
-    def apply(self, record: ScreenRecord) -> bool:
+    def apply(self, record: StockRecord) -> bool:
         df = record.recent_yf_yearly()
         if df.empty:
             return False
@@ -34,9 +33,9 @@ class PriceChangeScreen(BaseScreen):
 
         return self.min_value <= change <= self.max_value
 
-    def batch_apply(self, record: ScreenRecord, days: int) -> list[bool]:
+    def batch_apply(self, record: StockRecord, days) -> list[bool]:
 
-        df = record.recent_yf_yearly(days)
+        df = record.get_daily_chart_by_days(days+self.days)
         if df.empty:
             return False
         df = df.sort_index()
@@ -50,4 +49,4 @@ class PriceChangeScreen(BaseScreen):
         change = (close - past) / past * 100
         flags = [self.min_value <= v <= self.max_value for v in change]
 
-        return flags
+        return flags[-days:]

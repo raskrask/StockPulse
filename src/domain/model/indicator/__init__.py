@@ -1,14 +1,14 @@
-from .listed_stock_screen import ListedStockScreen
-from .market_cap_screen import MarketCapScreen
-from .avg_trading_value_screen import AvgTradingValueScreen
-from .rsi_screen import RsiScreen
-from .sma_screen import SmaScreen
-from .ytd_divergence_screen import YtdDivergenceScreen
-from .price_change_screen import PriceChangeScreen
-from .ichimoku_screen import IchimokuScreen
-from .double_bottom_screen import DoubleBottomScreen
+from .listed_stock_indicator import ListedStockIndicator
+from .market_cap_indicator import MarketCapIndicator
+from .avg_trading_value_indicator import AvgTradingValueIndicator
+from .rsi_indicator import RsiIndicator
+from .sma_indicator import SmaIndicator
+from .ytd_divergence_indicator import YtdDivergenceIndicator
+from .price_change_indicator import PriceChangeIndicator
+from .ichimoku_indicator import IchimokuIndicator
+from .double_bottom_indicator import DoubleBottomIndicator
 
 
-__all__ = ["ListedStockScreen", "MarketCapScreen", "AvgTradingValueScreen", 
-           "RsiScreen", "SmaScreen", "YtdDivergenceScreen", "PriceChangeScreen", 
-           "IchimokuScreen", "DoubleBottomScreen"]
+__all__ = ["ListedStockIndicator", "MarketCapIndicator", "AvgTradingValueIndicator", 
+           "RsiIndicator", "SmaIndicator", "YtdDivergenceIndicator", "PriceChangeIndicator", 
+           "IchimokuIndicator", "DoubleBottomIndicator"]

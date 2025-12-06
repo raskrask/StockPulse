@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import datetime
 import os
 from typing import Optional
-from infrastructure.util.io_utils import BASE_DIR, save_contents, exists_file
+import infrastructure.util.io_utils as io_utils
 #import openpyxl
 import xlrd
 
@@ -17,20 +17,6 @@ class JPXListingFetcher:
 
     def __init__(self):
        pass
-
-    def _get_filename(self) -> str:
-
-        target_day = datetime.date.today()
-
-        # 第3営業日前なら前月
-        if not self._is_third_business_day_passed():
-            target_day = target_day.replace(day=1) - datetime.timedelta(days=1)
-
-        return os.path.join(
-            BASE_DIR,
-            'jpx_list',
-            f"tse_list_{target_day.year}-{str(target_day.month).zfill(2)}.xls",
-        )
 
     def _is_third_business_day_passed(self) -> bool:
         """
@@ -56,10 +42,10 @@ class JPXListingFetcher:
         """Download the latest JPX listing Excel if needed."""
         
         # 月ごとのファイル名
-        filepath = self._get_filename()
+        filepath = io_utils.get_jpx_filename(self._is_third_business_day_passed())
 
         # すでに存在する場合
-        if exists_file(filepath):
+        if io_utils.exists_file(filepath):
             return xlrd.open_workbook(filepath)
 
         print("[JPX] Fetch start...")
@@ -85,7 +71,7 @@ class JPXListingFetcher:
             return None
 
         er.raise_for_status()
-        save_contents(er.content, filepath)
+        io_utils.save_contents(er.content, filepath)
         return xlrd.open_workbook(filepath)
 
 

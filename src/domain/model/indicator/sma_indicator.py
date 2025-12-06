@@ -1,10 +1,9 @@
-from domain.model.base_screen import BaseScreen
-from domain.model.screen_record import  ScreenRecord
-from infrastructure.yf_fetcher import fetch_yf_daily
+from .base_indicator import BaseIndicator
+from domain.model.stock_record import  StockRecord
 from datetime import datetime, timedelta
 import talib
 
-class SmaScreen(BaseScreen):
+class SmaIndicator(BaseIndicator):
 
     def __init__(self, key, value: list[int], period1: int, period2: int = None):
         """ SMAフィルター SMAtoSMA比率またはSMAto現在値比率 """
@@ -14,7 +13,7 @@ class SmaScreen(BaseScreen):
         self.period1 = period1
         self.period2 = period2
 
-    def apply(self, record: ScreenRecord) -> bool:
+    def apply(self, record: StockRecord) -> bool:
 
         df = record.recent_yf_yearly()
         if df.empty:
@@ -31,9 +30,9 @@ class SmaScreen(BaseScreen):
 
         return self.min_value <= ratio <= self.max_value
 
-    def batch_apply(self, record: ScreenRecord, days: int) -> list[bool]:
-
-        df = record.recent_yf_yearly(days)
+    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+        period = max(self.period1 or 0, self.period2 or 0)
+        df = record.get_daily_chart_by_days(days + period)
         if df.empty:
             return False
 
@@ -46,4 +45,4 @@ class SmaScreen(BaseScreen):
 
         flags = [self.min_value <= v <= self.max_value for v in ratio]
 
-        return flags
+        return flags[-days:]

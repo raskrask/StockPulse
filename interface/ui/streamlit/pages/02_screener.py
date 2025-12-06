@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from ui.streamlit.components import screening_filters
+from ui.streamlit.components import screening_filters, StreamlitProgressReporter
 from application.screening_usecase import ScreeningUsecase
 
 st.sidebar.title("スクリーニング条件")
@@ -14,11 +14,8 @@ filters = screening_filters()
 if st.sidebar.button("スクリーニングを実行"):
     st.success("スクリーニングが実行されました。該当する銘柄リストを表示します。")
 
-    progress_bar = st.progress(0.0, text="Ready")
-    def progress_callback(p: float, text: str):
-        progress_bar.progress(p, text=text)
-
-    screen_stocks = ScreeningUsecase().screen_stocks(params=filters, progress_callback=progress_callback)
+    progress_reporter = StreamlitProgressReporter()
+    screen_stocks = ScreeningUsecase(progress=progress_reporter).screen_stocks(params=filters)
     if screen_stocks:
         symbols = " ".join(s['symbol'] for s in screen_stocks)
         st.markdown(f"検索結果({len(screen_stocks)})件：`{symbols}`")

@@ -27,11 +27,12 @@ def save_contents(buffer: bytes, path: str):
         bucket, key = _split_s3_path(path)
         s3.put_object(Bucket=bucket, Key=key, Body=buffer)
     else:
+        path = os.path.join(BASE_DIR, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "wb") as f:
             f.write(buffer)
 
-def save_parquet(df: pd.DataFrame, path: str):
+def save_parquet(path: str, df: pd.DataFrame):
     """
     DataFrameをS3またはローカルに保存
     """
@@ -40,10 +41,11 @@ def save_parquet(df: pd.DataFrame, path: str):
         buffer = df.to_parquet(index=False)
         s3.put_object(Bucket=bucket, Key=key, Body=buffer)
     else:
+        path = os.path.join(BASE_DIR, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         df.to_parquet(path, index=False)
 
-def save_json(data: dict, path: str):
+def save_json(path: str, data: dict):
     """
     JsonデータをS3またはローカルに保存
     """
@@ -56,6 +58,7 @@ def save_json(data: dict, path: str):
         bucket, key = _split_s3_path(path)
         s3.put_object(Bucket=bucket, Key=key, Body=json_str)
     else:
+        path = os.path.join(BASE_DIR, path)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             f.write(json.dumps(data, ensure_ascii=False, indent=4))
@@ -73,6 +76,7 @@ def exists_file(path: str) -> bool:
         except s3.exceptions.ClientError:
             return False
     else:
+        path = os.path.join(BASE_DIR, path)
         return os.path.exists(path)
 
 def load_parquet(path: str) -> pd.DataFrame | None:
@@ -86,6 +90,7 @@ def load_parquet(path: str) -> pd.DataFrame | None:
             obj = s3.get_object(Bucket=bucket, Key=key)
             return pd.read_parquet(obj["Body"])
         else:
+            path = os.path.join(BASE_DIR, path)
             if os.path.exists(path):
                 return pd.read_parquet(path)
     except Exception:
@@ -104,6 +109,7 @@ def load_json(path: str) -> dict | None:
             obj = s3.get_object(Bucket=bucket, Key=key)
             return json.load(obj["Body"])
         else:
+            path = os.path.join(BASE_DIR, path)
             if os.path.exists(path):
                 data = json.load(open(path, "r"))
                 if 'date' in data:
@@ -115,22 +121,46 @@ def load_json(path: str) -> dict | None:
     return None
 
 # ---------- キャッシュ更新ロジック ----------
-def get_daily_cache_path(symbol: str, date: datetime, recently_cached: bool = True) -> str:
+def get_daily_recently_cache_path(symbol: str, target_date: datetime) -> str:
+    """
+    日足キャッシュの保存先パスを返す
+    """
+    ymd = target_date.strftime("%Y-%m-%d")
+    return f"{symbol}/daily/{ymd}.parquet"
+
+def get_daily_month_cache_path(symbol: str, target_date: datetime) -> str:
     """
     日足キャッシュの保存先パスを返す（月単位）
     """
-    ym = date.strftime("%Y-%m")
-    if recently_cached:
-        ym = date.strftime("%Y-%m-%d")
-    return f"{BASE_DIR}/{symbol}/daily/{ym}.parquet"
-
+    today = datetime.today()
+    current_month = (today.year == target_date.year) and (today.month == target_date.month)
+    if current_month:
+        return get_daily_recently_cache_path(symbol, target_date)
+    else:
+        ym = target_date.strftime("%Y-%m")
+    return f"{symbol}/daily/{ym}.parquet"
 
 def get_weekly_cache_path(symbol: str):
-    return f"{BASE_DIR}/{symbol}/weekly.parquet"
+    return f"{symbol}/weekly.parquet"
 
 
 def get_monthly_cache_path(symbol: str):
-    return f"{BASE_DIR}/{symbol}/monthly.parquet"
+    return f"{symbol}/monthly.parquet"
+
+
+def get_jpx_filename(_is_third_business_day_passed) -> str:
+
+    target_day = datetime.today()
+
+    # 第3営業日前なら前月
+    if not _is_third_business_day_passed:
+        target_day = target_day.replace(day=1) - datetime.timedelta(days=1)
+
+    return os.path.join(
+        BASE_DIR,
+        'jpx_list',
+        f"tse_list_{target_day.year}-{str(target_day.month).zfill(2)}.xls",
+    )
 
 
 # ---------- ヘルパー ----------

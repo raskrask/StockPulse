@@ -1,5 +1,5 @@
 import streamlit as st
-from ui.streamlit.components import screening_filters, backtest_results
+from ui.streamlit.components import screening_filters, backtest_results, StreamlitProgressReporter
 from application.screening_usecase import ScreeningUsecase
 from application.backtest_usecase import BacktestUsecase
 
@@ -13,10 +13,7 @@ filters = screening_filters()
 if st.sidebar.button("バックテストを実行"):
     st.success("バックテストが実行されました。")
 
-    progress_bar = st.progress(0.0, text="Ready")
-    def progress_callback(p: float, text: str):
-        progress_bar.progress(p, text=text)
-
-    results = BacktestUsecase().execute_backtest(params=filters, progress_callback=progress_callback)
+    progress_reporter = StreamlitProgressReporter()
+    results = BacktestUsecase(progress=progress_reporter).execute_backtest(params=filters)
     if results:
         backtest_results(results)

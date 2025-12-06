@@ -5,7 +5,6 @@ from pandas_datareader import data as pdr
 from datetime import datetime, timedelta
 from analysis.regimes.trend import add_trend, trend_status, overall_comment
 from ui import metric_card
-from data.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly
 
 # st.set_page_config(page_title="StockPulse", layout="wide")
 # st.title("🌍 StockPulse ダッシュボード")

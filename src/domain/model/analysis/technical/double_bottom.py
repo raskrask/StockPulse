@@ -1,7 +1,7 @@
 from scipy.signal import find_peaks
 import pandas as pd
 
-class DoubleBottomIndicator:
+class DoubleBottom:
 
     @staticmethod
     def compute_double_bottom_signal(df) -> dict:
