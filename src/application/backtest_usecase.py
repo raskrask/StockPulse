@@ -10,12 +10,13 @@ from datetime import datetime, timedelta
 
 class BacktestUsecase:
     def __init__(self, progress: ProgressReporter = NullProgressReporter(), use_cache=True):
+        test_term = 2*365
         self.progress_reporter = progress
         self.use_cache = use_cache
         self.stock_repo = StockRepository()
         self.screen_builder = ScreenBuilder()
-        self.trigger_generator = TriggerGenerator(use_cache=use_cache)
-        self.strategy_simulator = StrategySimulator(use_cache=use_cache)
+        self.trigger_generator = TriggerGenerator(test_term, use_cache=use_cache)
+        self.strategy_simulator = StrategySimulator(test_term, use_cache=False)
         self.backtest_evaluator = BacktestEvaluator()
 
     def execute_backtest(self, params: dict) -> list:
@@ -23,6 +24,7 @@ class BacktestUsecase:
         指定されたフィルター条件に基づいて銘柄をバックテストする
         """
         start_time = datetime.now()
+        test_range = 2*365
 
         # ① repository から銘柄一覧を取得（domain/repository）
         stocks = self.stock_repo.list_all_stocks(params)
