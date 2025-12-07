@@ -19,19 +19,18 @@ class UenoTheory:
         return df
 
         
-    def detect_signal(self, df, window_size=60):
+    def detect_signal(self, df):
         df = df.copy()
         df["ueno_theory_signal"] = False
 
         for i in range(len(df)):
 
             # window_size 前を取得（i-window_size が 0 未満の場合も安全に扱う）
-            start = max(0, i - window_size)
+            start = max(0, i - self.window_size)
             hv_df = df.iloc[start:i]
 
             # 高出来高だけに絞る
             hv_df = hv_df[hv_df["is_high_volume"]]
-
             if hv_df.empty:
                 continue
 
@@ -57,6 +56,6 @@ class UenoTheory:
 
         # 平均 + 標準偏差1.5倍以上、z2.5以上を急増と判定
         threshold = vol_mean + volume_ratio * vol_std
-        df['is_high_volume'] = (vol > threshold) & (cv > cv_threshold) & (z > z_threshold) & pos
+        df['is_high_volume'] = (vol > threshold) & (cv > cv_threshold) & (z > z_threshold)# & pos
 
         return df
