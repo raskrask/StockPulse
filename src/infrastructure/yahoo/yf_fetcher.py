@@ -235,7 +235,7 @@ def fetch_yf_weekly(
     path = io_util.get_weekly_cache_path(symbol)
     df_cached = io_util.load_parquet(path)
 
-    df_daily = io_util.fetch_yf_daily(symbol, start, end)
+    df_daily = fetch_yf_daily_OLD(symbol, start, end)
     if df_daily.empty:
         return pd.DataFrame()
 
@@ -284,7 +284,7 @@ def fetch_yf_monthly(
     path = io_util.get_monthly_cache_path(symbol)
     df_cached = io_util.load_parquet(path)
 
-    df_daily = io_util.fetch_yf_daily(symbol, start, end)
+    df_daily = fetch_yf_daily_OLD(symbol, start, end)
     if df_daily.empty:
         return pd.DataFrame()
 

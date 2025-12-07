@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from infrastructure.yahoo.yf_fetcher import fetch_yf_daily
+from infrastructure.yahoo.yf_fetcher import fetch_yf_daily_by_month
 from domain.model.analysis.regimes.trend import add_trend, trend_status, is_upward, is_downward
 from ui.streamlit.components import market_card
 
@@ -23,14 +23,14 @@ indices = {
     "ドル円": "JPY=X",
 }
 
-start = datetime.today() - timedelta(days=365 * 2)
+start = datetime.today()
 
 cols = st.columns(2)
 
 for i, (name, symbol) in enumerate(indices.items()):
     col = cols[i % 2]
     with col:
-        df = fetch_yf_daily(symbol, start)
+        df = fetch_yf_daily_by_month(symbol, start)
         df = add_trend(df)
 
         latest = df.iloc[-1]
