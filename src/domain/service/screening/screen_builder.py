@@ -16,6 +16,7 @@ class ScreenBuilder:
             "ytd_low_divergence": lambda key, v: YtdDivergenceIndicator(key, v, "low"),
             "ichimoku_3yakukoten": lambda key, v: IchimokuIndicator(key, v),
             "double_bottom_signal": lambda key, v: DoubleBottomIndicator(key, v),
+            "ueno_theory_signal": lambda key, v: UenoTheoryIndicator(key, v),
         }
 
         for key, builder in indicators.items():
