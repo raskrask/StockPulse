@@ -2,6 +2,7 @@ from domain.repository.stock_repository import StockRepository
 from domain.service.screening.screen_builder import ScreenBuilder
 from domain.service.screening.change_signal_detector import ChangeSignalDetector
 from domain.service.progress.console_progress_reporter import ConsoleProgressReporter
+from domain.service.daily_report.market_timer import MarketTimer
 from infrastructure.persistence.screening_profile import ScreeningProfile
 from datetime import datetime, timedelta
 
@@ -11,11 +12,15 @@ class DailyReportUsecase:
         self.stock_repo = StockRepository()
         self.profile_repo = ScreeningProfile()
         self.screen_builder = ScreenBuilder()
+        self.market_timer = MarketTimer()
         self.change_signal_detector = ChangeSignalDetector(progress=self.progress)
 
     def generate_buy_signals(self, name=None) -> str:
         """買い時株レポートを生成する"""
-        start_time = datetime.now()
+        timer = MarketTimer()
+        if not timer.should_run():
+            print("Skip: not the right time or already executed.")
+            return
 
         # ① 通知Screening条件を取得
         profiles = [self.profile_repo.load(p) for p in self.profile_repo.list_profiles()]
@@ -35,4 +40,5 @@ class DailyReportUsecase:
 
             result.append({ "profile": p, "trigger": triggers })
 
+        timer.mark_executed()
         return result
