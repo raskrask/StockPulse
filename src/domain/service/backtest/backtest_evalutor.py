@@ -17,13 +17,13 @@ class BacktestEvaluator:
         draw_rate = sum(x["sell_signal"]["result"] == "draw" for x in strategy) / len(strategy)
         # Profit Factor
         returns = [(x["sell_signal"]["close"]-x["buy_signal"]["close"])/x["buy_signal"]["close"] for x in strategy]
-        #returns = [(x["sell_signal"]["close"]-x["buy_signal"]["close"])*100 for x in strategy]
+        returns = [(x["sell_signal"]["close"]-x["buy_signal"]["close"])*100 for x in strategy]
         #returns = [(x["sell_signal"]["close"]-x["buy_signal"]["close"]) for x in strategy]
         trade_term = [x["sell_signal"]["date"]-x["buy_signal"]["date"] for x in strategy]
         gross_profit = sum([x for x in returns if x > 0])
         gross_loss = -sum([x for x in returns if x < 0])
         profit_factor = gross_profit / gross_loss if gross_loss > 0 else np.inf
-        total_return = gross_profit - gross_loss
+        total_return = sum(returns)
 
         # 最大ドローダウン
         total_return = sum([x for x in returns])

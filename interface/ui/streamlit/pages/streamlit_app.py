@@ -3,8 +3,8 @@ import yfinance as yf
 import pandas as pd
 from pandas_datareader import data as pdr
 from datetime import datetime, timedelta
-from analysis.regimes.trend import add_trend, trend_status, overall_comment
-from ui import metric_card
+from domain.model.analysis.regimes.trend import add_trend, trend_status
+from ui.streamlit.components import metric_card
 
 # st.set_page_config(page_title="StockPulse", layout="wide")
 # st.title("🌍 StockPulse ダッシュボード")
@@ -91,12 +91,12 @@ for idx in [sp500, nasdaq, nikkei]:
     )
     st.line_chart(idx["df"].set_index("date")[["close", "ema20", "ema50", "ema200"]])
 
-# 総合コメント
-summary, details = overall_comment(
-    sp500["trend"], nikkei["trend"], us_rate_trend, jp_rate_trend
-)
-st.markdown(f"## {summary}")
-st.caption(details)
+# # 総合コメント
+# summary, details = overall_comment(
+#     sp500["trend"], nikkei["trend"], us_rate_trend, jp_rate_trend
+# )
+# st.markdown(f"## {summary}")
+# st.caption(details)
 
 
 # ------------------------------test

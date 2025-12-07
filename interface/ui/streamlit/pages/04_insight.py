@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime, timedelta
 
-from infrastructure.yahoo.yf_fetcher import fetch_yf_daily, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
+from infrastructure.yahoo.yf_fetcher import fetch_yf_daily_by_month, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
 from domain.repository.stock_repository import StockRepository
 
@@ -29,7 +29,7 @@ def fetch_yf_cache(mode: str, symbol: str, start: datetime):
     elif mode == "monthly":
         df = fetch_yf_monthly(symbol, start)
     else:
-        df = fetch_yf_daily(symbol, start)
+        df = fetch_yf_daily_by_month(symbol, start)
     return df
 
 
