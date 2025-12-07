@@ -9,6 +9,9 @@ def main():
 
     # 1. 買い時株レポート作成
     signals = DailyReportUsecase().generate_buy_signals()
+
+    if signals is None:
+        return
     
     report = "個別株レポート\n"
     for s in signals:

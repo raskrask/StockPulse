@@ -11,3 +11,4 @@ tensorflow
 bs4
 xlrd
 dotenv
+jpholiday
