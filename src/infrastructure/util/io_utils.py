@@ -113,7 +113,9 @@ def load_json(path: str) -> dict | None:
             if os.path.exists(path):
                 data = json.load(open(path, "r"))
                 if 'date' in data:
-                    data['date'] = datetime.strptime(data['date'], "%Y-%m-%dT%H:%M:%S")
+                    #data['date'] = datetime.strptime(data['date'], "%Y-%m-%dT%H:%M:%S")
+                    data["date"] = datetime.fromisoformat(data["date"])
+
                 return data
 
     except Exception:

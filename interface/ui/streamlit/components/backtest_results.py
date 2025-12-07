@@ -31,6 +31,12 @@ def backtest_results(results: dict):
         names="勝率",
         values="値",
         hole=0.3,               # ドーナツ型に
+        color="勝率",
+        color_discrete_map={
+            "売確数": "green",
+            "損切り数": "red",
+            "キープ数": "gray",
+        }
     )
     rate_fig.update_traces(textposition='inside', textinfo='percent+label')
 
@@ -45,6 +51,11 @@ def backtest_results(results: dict):
         names="収益比率",
         values="値",
         hole=0.3,               # ドーナツ型に
+        color="収益比率",
+        color_discrete_map={
+            "利益率": "green",
+            "損失率": "red",
+        }
     )
     profit_fig.update_traces(textposition='inside', textinfo='percent+label')
 
