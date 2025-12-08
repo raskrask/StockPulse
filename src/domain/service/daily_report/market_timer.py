@@ -12,13 +12,6 @@ class MarketTimer:
         self.run_state_repo = RunStateRepository()
         self.now = datetime.now(self.JST)
 
-    def current_session(self) -> str | None:
-        if self.HIKE_END <= self.now.timetz():
-            return "hike"
-        if self.YORI_END <= self.now.timetz():
-            return "yori"
-        return None
-
     def previous_business_day(self) -> datetime:
         """土日祝を考慮した前営業日を返す"""
         d = self.now.date()
@@ -35,14 +28,10 @@ class MarketTimer:
             return self.previous_business_day()
         
         # 当日の場合には現在時刻から寄り引き時間に応じて実行
-        session = self.current_session()
-        if session == "hike":
+        if self.HIKE_END <= self.now.timetz():
             return datetime.combine(self.now, self.HIKE_END)
-
-        if session == "yori":
+        else:
             return datetime.combine(self.now, self.YORI_END)
-
-        return self.now
 
     def should_run(self) -> bool:
         state = self.run_state_repo.load()
