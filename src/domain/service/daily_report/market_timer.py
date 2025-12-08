@@ -1,20 +1,21 @@
-from datetime import datetime, time, timedelta
+from datetime import datetime, time, timedelta, timezone
 import jpholiday
 from infrastructure.persistence.run_state_repository import RunStateRepository
 
 
 class MarketTimer:
-    YORI_END   = time(9, 10)
-    HIKE_END   = time(15, 15)
+    JST = timezone(timedelta(hours=9))
+    YORI_END   = time(9, 10, tzinfo=JST)
+    HIKE_END   = time(15, 15, tzinfo=JST)
 
     def __init__(self):
         self.run_state_repo = RunStateRepository()
-        self.now = datetime.now()
+        self.now = datetime.now(self.JST)
 
     def current_session(self) -> str | None:
-        if self.HIKE_END <= self.now:
+        if self.HIKE_END <= self.now.timetz():
             return "hike"
-        if self.YORI_END <= self.now:
+        if self.YORI_END <= self.now.timetz():
             return "yori"
         return None
 
@@ -48,6 +49,7 @@ class MarketTimer:
         last_run_at = state.get(f"last_run_at")
         if last_run_at is None:
             return True
+        last_run_at = last_run_at.replace(tzinfo=self.JST)
 
         baseline = self.baseline_time()
 
