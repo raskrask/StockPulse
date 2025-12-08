@@ -3,6 +3,7 @@ import streamlit as st
 DEFAULT_PARAMS ={
     "ichimoku_3yakukoten": False, 
     "double_bottom_signal": False,
+    "ueno_theory_signal": False,
     "marketCap": (50000, 60000000),
     "avgTradingValue": (500000, 600000000),
     "RSI": (40, 60),
@@ -23,6 +24,9 @@ def screening_filters(component):
     )
     filters["double_bottom_signal"] = component.checkbox(
         "ダブルボトムシグナル", key="double_bottom_signal", value=DEFAULT_PARAMS["double_bottom_signal"], 
+    )
+    filters["ueno_theory_signal"] = component.checkbox(
+        "上野理論シグナル", key="ueno_theory_signal", value=DEFAULT_PARAMS["ueno_theory_signal"], 
     )
 
     filters["marketCap"] = component.slider(
@@ -68,6 +72,7 @@ def set_screening_params(params):
     st.session_state.stockNumbers = new_params.get("stockNumbers","")
     st.session_state.ichimoku_3yakukoten = new_params.get("ichimoku_3yakukoten")
     st.session_state.double_bottom_signal = new_params.get("double_bottom_signal")
+    st.session_state.ueno_theory_signal = new_params.get("ueno_theory_signal")
     st.session_state.marketCap = new_params.get("marketCap")
     st.session_state.avgTradingValue = new_params.get("avgTradingValue")
     st.session_state.RSI = new_params.get("RSI")
