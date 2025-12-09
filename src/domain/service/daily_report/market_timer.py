@@ -30,8 +30,11 @@ class MarketTimer:
         # 当日の場合には現在時刻から寄り引き時間に応じて実行
         if self.HIKE_END <= self.now.timetz():
             return datetime.combine(self.now, self.HIKE_END)
+        elif self.HIKE_END <= self.now.timetz():
+            return datetime.combine(self.now, self.HIKE_END)
         else:
-            return datetime.combine(self.now, self.YORI_END)
+            return self.now.replace(hour=0, minute=0)
+
 
     def should_run(self) -> bool:
         state = self.run_state_repo.load()
