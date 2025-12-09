@@ -2,7 +2,8 @@ from domain.model.indicator import *
 
 class ScreenBuilder:
     def build_indicators(self, params: dict) -> list:
-        result = [ListedStockIndicator(params)]
+        # デフォルトインジゲーターの設定
+        result = [ListedStockIndicator(params), TrendIndicator(params)]
 
         indicators = {
             "marketCap": lambda key, v: MarketCapIndicator(key, [x * 1_000_000 for x in v]),

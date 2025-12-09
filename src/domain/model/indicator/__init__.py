@@ -8,8 +8,9 @@ from .price_change_indicator import PriceChangeIndicator
 from .ichimoku_indicator import IchimokuIndicator
 from .double_bottom_indicator import DoubleBottomIndicator
 from .ueno_theory_indicator import UenoTheoryIndicator
+from .trend_indicator import TrendIndicator
 
 
 __all__ = ["ListedStockIndicator", "MarketCapIndicator", "AvgTradingValueIndicator", 
            "RsiIndicator", "SmaIndicator", "YtdDivergenceIndicator", "PriceChangeIndicator", 
-           "IchimokuIndicator", "DoubleBottomIndicator", "UenoTheoryIndicator"]
+           "IchimokuIndicator", "DoubleBottomIndicator", "UenoTheoryIndicator", "TrendIndicator"]
