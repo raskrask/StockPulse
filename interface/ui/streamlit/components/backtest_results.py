@@ -15,7 +15,7 @@ def backtest_results(results: dict):
     col4, col5, col6 = st.columns(3)
     col4.metric("プロフィットファクター", f"{results['profit_factor']:.2f}")
     col5.metric("平均保有期間", f"{results['trade_term_avg']:.1f} 日")
-    col6.metric("総リターン", f"{results['total_return']:.2f} 倍")
+    col6.metric("総リターン", f"{results['total_return']:.2f} 円")
 
     st.write("---")
 
@@ -73,6 +73,7 @@ def backtest_results(results: dict):
     # daily_df["total"] = daily_df["price"].cumsum()
     # daily_df["total"] = daily_df["total"] * 100
 
+    # ----------------- 収益比率推移グラフ
     price = [[s["sell_signal"]["date"], 
               (s["sell_signal"]["close"]-s["buy_signal"]["close"])/s["buy_signal"]["close"]] 
               for s in results['strategy']]
@@ -81,11 +82,27 @@ def backtest_results(results: dict):
     price_df["total"] = price_df["price"].cumsum()
 
 
-    st.subheader("収益推移グラフ")
+    st.subheader("収益比率推移グラフ")
     fig = px.line( price_df, x="date", y="total" )    
     st.plotly_chart(fig, width='stretch')
 
+    # ----------------- 資産累計変動グラフ
+    buy_df = pd.DataFrame([ s["buy_signal"] for s in results['strategy']])
+    buy_df["close"] = -buy_df["close"]
+    sell_df = pd.DataFrame([ s["sell_signal"] for s in results['strategy']])
+    price_df = pd.concat([sell_df, buy_df], ignore_index=True)
+    price_df["date"] = pd.to_datetime(price_df["date"])
+    price_df = price_df.rename(columns={"close": "price"})
+    price_df["price"] = (price_df["price"]*100).astype(int)
 
+    price_df = price_df.groupby("date", as_index=False)["price"].sum()
+    price_df["total"] = price_df["price"].cumsum()
+
+    st.subheader("資産累計変動グラフ")
+    fig = px.line( price_df, x="date", y="total" )    
+    st.plotly_chart(fig, width='stretch')
+
+    # ----------------- 明細
     df = [[s["symbol"],s["name"], s["sell_signal"]["result"],
            s["buy_signal"]["date"], s["buy_signal"]["close"],
            s["sell_signal"]["date"], s["sell_signal"]["close"]] 
