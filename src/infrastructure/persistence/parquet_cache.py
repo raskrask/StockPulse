@@ -1,5 +1,6 @@
 import infrastructure.util.io_utils as io_utils
 import pandas as pd
+from datetime import datetime
 
 # 日足のキャッシュファイル有無
 def exists_daily_by_month(symbol, month) -> bool:
@@ -21,8 +22,12 @@ def save_daily_by_month(symbol, month, df) -> list:
 def load_daily_month_between(symbol,from_date, to_date) -> list:
     results = []
     from_date = from_date.replace(day=1)
+    today = datetime.today()
     monthly_ranges = pd.date_range(start=from_date, end=to_date, freq="MS")
     for ym in monthly_ranges:
+        if ym.year == today.year and ym.month == today.month and \
+           ym.year == to_date.year and ym.month == to_date.month:
+            ym = to_date
         if exists_daily_by_month(symbol, ym):
             results.append(load_daily_by_month(symbol, ym))
 

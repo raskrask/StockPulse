@@ -47,7 +47,8 @@ class ChartRepository:
         return final.loc[mask]
     
     def _detect_missing_ranges(self, df_cached, from_date, to_date):
-        all_months = pd.date_range(start=from_date, end=to_date, freq="MS")
+        start = from_date.replace(day=1)
+        all_months = pd.date_range(start=start, end=to_date, freq="MS")
         if df_cached is None or df_cached.empty:
             return all_months
 
