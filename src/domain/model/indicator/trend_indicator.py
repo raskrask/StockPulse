@@ -20,7 +20,7 @@ class TrendIndicator(BaseIndicator):
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
         today = datetime.today()
-        start = today - timedelta(days=days)
+        start = today - timedelta(days=days+1) # 当日のVIXは取得できない場合あり
 
         df = self.repo.load_daily_range(self.VIX_SIMBOL, start, today)
-        return df["close"] < self.VIX_RISK_ON
+        return df[df["close"] < self.VIX_RISK_ON].iloc[-2:]
