@@ -45,5 +45,10 @@ class BacktestUsecase:
         metrics = self.backtest_evaluator.run(results, params=params)
         self.progress_reporter.report(1.0, text=f"Completed in {datetime.now() - start_time}")
 
+        # 実行時間チェック
+        for k, v in sorted(self.trigger_generator.timer_map.items(), key=lambda x: x[1], reverse=True):
+            print(f"{k:20s} {v:.3f} sec")
+        metrics["timer"] = { k: v for k, v in sorted(self.trigger_generator.timer_map.items(), key=lambda x: x[1], reverse=True) }
+        
         return metrics
 

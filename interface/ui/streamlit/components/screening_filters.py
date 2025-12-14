@@ -35,7 +35,7 @@ def screening_filters(component):
     )
 
     filters["avgTradingValue"] = component.slider(
-        "平均出来高[20日間]（千円）", key="avgTradingValue", value=DEFAULT_PARAMS["avgTradingValue"], 
+        "平均売買価格[20日間]（千円）", key="avgTradingValue", value=DEFAULT_PARAMS["avgTradingValue"], 
         min_value=0, max_value=600000000, step=10000,
     )
 

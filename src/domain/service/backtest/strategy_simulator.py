@@ -39,7 +39,7 @@ class StrategySimulator:
 
         # 利益・損失達成インデックス
         profit_idx = buy_window[buy_window["close"] >= strategy_profit]
-        loss_idx = buy_window[buy_window["close"] <= strategy_loss]
+        loss_idx = []#buy_window[buy_window["close"] <= strategy_loss]
 
         # 判定
         strategy = None

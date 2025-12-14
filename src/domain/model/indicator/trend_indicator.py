@@ -8,19 +8,24 @@ class TrendIndicator(BaseIndicator):
 
     VIX_SIMBOL = "^VIX"
     VIX_RISK_ON = 25
+    vix_risk = None # 呼び出し結果が同一のためキャッシュ
 
     def __init__(self, key):
         super().__init__("trend")
         self.repo = ChartRepository()
 
     def apply(self, record: StockRecord) -> bool:
-        df = self.repo.load_daily_by_month(self.VIX_SIMBOL, datetime.today())
+        if self.vix_risk is None:
+            df = self.repo.load_daily_by_month(self.VIX_SIMBOL, datetime.today())
+            self.vix_risk = df['close'] <= self.VIX_RISK_ON
 
-        return df['close'].iloc[-1] <= self.VIX_RISK_ON
+        return self.vix_risk.iloc[-1]
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
-        today = datetime.today()
-        start = today - timedelta(days=days+1) # 当日のVIXは取得できない場合あり
+        if self.vix_risk is None:
+            today = datetime.today()
+            start = today - timedelta(days=days+1) # 当日のVIXは取得できない場合あり
 
-        df = self.repo.load_daily_range(self.VIX_SIMBOL, start, today)
-        return df[df["close"] < self.VIX_RISK_ON].iloc[-2:]
+            df = self.repo.load_daily_range(self.VIX_SIMBOL, start, today)
+            self.vix_risk = df[df["close"] < self.VIX_RISK_ON]
+        return self.vix_risk.iloc[-2:]

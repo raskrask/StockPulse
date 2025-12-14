@@ -11,7 +11,7 @@ class AvgTradingValueIndicator(BaseIndicator):
         df = record.recent_yf_monthly()
         if df is None or df.empty:   
             return False
-        trading_value = (df['close'].rolling(20).mean() * df['volume'].rolling(20).mean()).iloc[-1]
+        trading_value = ((df['close'] * df['volume']).rolling(20).mean()).iloc[-1]
         record.values[self.key] = [trading_value, self.min_value, self.max_value]
 
         return self.min_value <= trading_value <= self.max_value
@@ -20,7 +20,7 @@ class AvgTradingValueIndicator(BaseIndicator):
         df = record.get_daily_chart_by_days(days+20)
         if df is None or df.empty:
             return False
-        trading_value = (df['close'].rolling(20).mean() * df['volume'].rolling(20).mean())
-        flags = [self.min_value <= v <= self.max_value for v in trading_value]
+        trading_value = ((df['close'] * df['volume']).rolling(20).mean())
+        flags = trading_value.between(self.min_value, self.max_value)
 
         return flags[-days:]
