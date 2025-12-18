@@ -1,4 +1,4 @@
-from .base_indicator import BaseIndicator
+from domain.model.indicator.base_indicator import BaseIndicator
 from domain.model.stock_record import  StockRecord
 from domain.repository.chart_repository import ChartRepository
 import pandas as pd

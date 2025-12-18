@@ -1,6 +1,6 @@
 
 from domain.model.analysis.technical.ichimoku_kintohyo import IchimokuKintohyo
-from .base_indicator import BaseIndicator
+from domain.model.indicator.base_indicator import BaseIndicator
 from domain.model.stock_record import  StockRecord
 
 class IchimokuIndicator(BaseIndicator):

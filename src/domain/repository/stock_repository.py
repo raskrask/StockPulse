@@ -1,6 +1,6 @@
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
 from domain.model.stock_record import  StockRecord
-from domain.model.indicator.listed_stock_indicator import ListedStockIndicator
+from domain.model.indicator.fundamental.listed_stock_indicator import ListedStockIndicator
 
 class StockRepository:
     def list_all_stocks(self, params={}) -> list:
