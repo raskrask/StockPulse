@@ -1,4 +1,4 @@
-from .base_indicator import BaseIndicator
+from domain.model.indicator.base_indicator import BaseIndicator
 from domain.model.stock_record import  StockRecord
 from infrastructure.yahoo.yf_fetcher import fetch_yf_info
 import pandas as pd

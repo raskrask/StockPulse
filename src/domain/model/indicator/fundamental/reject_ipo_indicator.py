@@ -1,34 +1,20 @@
-import xlrd
-from .base_indicator import BaseIndicator
+from domain.model.indicator.base_indicator import BaseIndicator
 from domain.model.stock_record import  StockRecord
 from infrastructure.yahoo.yf_fetcher import fetch_yf_info
-from datetime import timedelta
 import pandas as pd
+from datetime import timedelta
 
-class ListedStockIndicator(BaseIndicator):
-    TARGET_MARKETS = ["プライム（内国株式）", "スタンダード（内国株式）", "グロース（内国株式）"]
-    IGNORE_STOKS = ["9023.T"]
+class RejectIpoIndicator(BaseIndicator):
 
-    def __init__(self, params: dict, market: list[str] = []):
-        super().__init__("listed_stock")
-        self.stockNumbers = params.get('stockNumbers', '').strip()
-        self.market = market + self.TARGET_MARKETS
+    def __init__(self, params: dict):
+        super().__init__("reject_ipo")
 
     def apply(self, record: StockRecord) -> bool:
-        if self.stockNumbers and record.symbol not in self.stockNumbers:
-            return False
-        if record.symbol in self.IGNORE_STOKS:
-            return False
-        if self._reject_ipo_stock(record):
-            return False
-
-        return record.market in self.market
+        return self._reject_ipo_stock(record)
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
-        if self._reject_firstTradeDate(record, days):
-            return [False] * days
-
-        return [self.apply(record)] * days
+        result = self._reject_firstTradeDate(record, days)
+        return [result] * days
 
     def _get_first_trade_date(self, record: StockRecord):
         info = fetch_yf_info(record.symbol)
@@ -41,7 +27,7 @@ class ListedStockIndicator(BaseIndicator):
         firstTradeDate = self._get_first_trade_date(record)
 
         today = pd.Timestamp.today()
-        years_ago = today - timedelta(365)
+        years_ago = today - timedelta(260*2)
 
         if firstTradeDate is None or firstTradeDate > years_ago:
             return True

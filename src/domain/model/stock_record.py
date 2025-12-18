@@ -48,7 +48,7 @@ class StockRecord:
         self._memory_cache_days = df
         self._memory_days = len(df)
 
-        return self._memory_cache_days
+        return self._memory_cache_days[-days:]
 
     def get_daily_chart(self, from_date, to_date):
         # 期間完全一致ならメモリから返す

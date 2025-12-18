@@ -9,7 +9,7 @@ class BacktestEvaluator:
         """
         strategy = [s for s in strategy if s is not None]
         if len(strategy) == 0:
-            return {}
+            return {"trades":0}
 
         # 勝率
         win_rate = sum(x["sell_signal"]["result"] == "win" for x in strategy) / len(strategy)
