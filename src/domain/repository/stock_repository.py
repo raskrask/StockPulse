@@ -1,4 +1,5 @@
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
+from infrastructure.yahoo.yf_fetcher import fetch_yf_info
 from domain.model.stock_record import  StockRecord
 from domain.model.indicator.fundamental.listed_stock_indicator import ListedStockIndicator
 
@@ -32,3 +33,5 @@ class StockRepository:
 
         return None
     
+    def get_stock_info_by_symbol(self, symbol: str) -> StockRecord:
+        return fetch_yf_info(symbol)

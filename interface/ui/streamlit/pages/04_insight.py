@@ -22,8 +22,9 @@ st.write("業種:", record.rawdata[7].value)
 st.write("規模:", record.rawdata[9].value)
 
 start = datetime.today() - timedelta(days=365)
-info = fetch_yf_info(symbol)
+info = repo.get_stock_info_by_symbol(symbol)
 st.write("時価総額", "{:,}".format(info['marketCap']))
+st.write("初回取引日時", pd.to_datetime(info['firstTradeDateMilliseconds'], unit="ms"))
 
 #@st.cache_data(ttl=3600)
 def fetch_yf_cache(mode: str, symbol: str, start: datetime):
