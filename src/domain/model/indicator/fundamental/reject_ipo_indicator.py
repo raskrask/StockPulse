@@ -1,5 +1,5 @@
 from domain.model.indicator.base_indicator import BaseIndicator
-from domain.model.stock_record import  StockRecord
+from domain.model.stock_record import StockRecord
 from infrastructure.yahoo.yf_fetcher import fetch_yf_info
 import pandas as pd
 from datetime import timedelta
@@ -10,11 +10,11 @@ class RejectIpoIndicator(BaseIndicator):
         super().__init__("reject_ipo")
 
     def apply(self, record: StockRecord) -> bool:
-        return self._reject_ipo_stock(record)
+        return not self._reject_ipo_stock(record)
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
         result = self._reject_firstTradeDate(record, days)
-        return [result] * days
+        return [not result] * days
 
     def _get_first_trade_date(self, record: StockRecord):
         info = fetch_yf_info(record.symbol)
@@ -31,6 +31,7 @@ class RejectIpoIndicator(BaseIndicator):
 
         if firstTradeDate is None or firstTradeDate > years_ago:
             return True
+        return False
 
     def _reject_firstTradeDate(self, record: StockRecord, days):
         '''株式公開日が集計範囲に満たないため対象外とする'''
@@ -41,3 +42,4 @@ class RejectIpoIndicator(BaseIndicator):
 
         if firstTradeDate is None or firstTradeDate > bdays_ago:
             return True
+        return False
