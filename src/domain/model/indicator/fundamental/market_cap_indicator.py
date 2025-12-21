@@ -1,6 +1,5 @@
 from domain.model.indicator.base_indicator import BaseIndicator
 from domain.model.stock_record import  StockRecord
-from infrastructure.yahoo.yf_fetcher import fetch_yf_info
 import pandas as pd
 
 class MarketCapIndicator(BaseIndicator):
@@ -11,12 +10,12 @@ class MarketCapIndicator(BaseIndicator):
         self.max_cap = cap[1]
 
     def apply(self, record: StockRecord) -> bool:
-        info = fetch_yf_info(record.symbol)
-        if not info or 'marketCap' not in info:
-            return False
-        record.values[self.key] = info['marketCap']
+        market_cap = record.get_stock_market_cap()
 
-        return self.min_cap <= info['marketCap'] <= self.max_cap
+        if market_cap is None:
+            return False
+
+        return self.min_cap <= market_cap <= self.max_cap
 
     def batch_apply(self, record: StockRecord, days) -> list[bool]:
         return [self.apply(record)] * days

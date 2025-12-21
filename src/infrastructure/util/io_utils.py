@@ -137,7 +137,7 @@ def get_daily_month_cache_path(symbol: str, target_date: datetime) -> str:
     today = datetime.today()
     current_month = (today.year == target_date.year) and (today.month == target_date.month)
     if current_month:
-        return get_daily_recently_cache_path(symbol, target_date)
+        return get_daily_recently_cache_path(symbol, today)
     else:
         ym = target_date.strftime("%Y-%m")
     return f"{symbol}/daily/{ym}.parquet"

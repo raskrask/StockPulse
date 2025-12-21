@@ -10,7 +10,7 @@ class TrendIndicator(BaseIndicator):
     VIX_RISK_ON = 25
     vix_risk = None # 呼び出し結果が同一のためキャッシュ
 
-    def __init__(self, key):
+    def __init__(self, params: dict = {}):
         super().__init__("trend")
         self.repo = ChartRepository()
 

@@ -22,7 +22,7 @@ st.write("業種:", record.rawdata[7].value)
 st.write("規模:", record.rawdata[9].value)
 
 start = datetime.today() - timedelta(days=365)
-info = repo.get_stock_info_by_symbol(symbol)
+info = record.get_stock_info()
 st.write("時価総額", "{:,}".format(info['marketCap']))
 st.write("初回取引日時", pd.to_datetime(info['firstTradeDateMilliseconds'], unit="ms"))
 

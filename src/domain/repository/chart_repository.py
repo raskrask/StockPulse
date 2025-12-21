@@ -25,12 +25,13 @@ class ChartRepository:
         """
         指定された銘柄の指定期間の日足チャートデータを取得する
         """
-
+        import streamlit as st
         # Step1: 月次キャッシュの取得
         dfs = cache_store.load_daily_month_between(symbol, from_date, to_date)
 
         # Step2: キャッシュで不足している範囲を検出
-        df_cached = pd.concat(dfs, ignore_index=True).sort_index() if dfs else pd.DataFrame()
+        df_cached = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+        df_cached = df_cached.set_index("date", drop=False).sort_index()
 
         missing_months = self._detect_missing_ranges(df_cached, from_date, to_date)
 

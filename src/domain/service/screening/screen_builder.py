@@ -14,6 +14,15 @@ from domain.model.indicator.fundamental.market_cap_indicator import MarketCapInd
 from domain.model.indicator.fundamental.reject_ipo_indicator import RejectIpoIndicator
 
 class ScreenBuilder:
+
+    def build_default_indicators(self) -> list:
+        # デフォルトインジゲーターの設定
+        return [
+            ListedStockIndicator(), 
+            TrendIndicator(), 
+            RejectIpoIndicator()
+        ]
+    
     """
     「売買判断の観測軸」を定義する Indicatorのファクトリークラス
     Indicator は以下の判断軸ごとにサブフォルダで分類する。

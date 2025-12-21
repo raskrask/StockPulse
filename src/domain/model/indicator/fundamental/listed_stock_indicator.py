@@ -8,7 +8,7 @@ class ListedStockIndicator(BaseIndicator):
     TARGET_MARKETS = ["プライム（内国株式）", "スタンダード（内国株式）", "グロース（内国株式）"]
     IGNORE_STOKS = ["9023.T"]
 
-    def __init__(self, params: dict, market: list[str] = []):
+    def __init__(self, params: dict = {}, market: list[str] = []):
         super().__init__("listed_stock")
         self.stockNumbers = params.get('stockNumbers', '').strip()
         self.market = market + self.TARGET_MARKETS
