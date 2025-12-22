@@ -25,11 +25,11 @@ class CacheStoreUsecase:
             #if stock.symbol != '130A.T':
             #    continue
 
-            self.progress_reporter.report(int((i+1)/len(stocks)*100), text=f"Processing {stock.symbol}...")
+            self.progress_reporter.report((i+1)/len(stocks), text=f"Processing {stock.symbol}...")
             if self._is_cached_chart(stock, chart_days):
                 full_charts += 1
         
-        self.progress_reporter.report(100, text="Cache stats fetched.")
+        self.progress_reporter.report(1.0, text="Cache stats fetched.")
         return {
             "total_stocks": len(stocks),
             "stocks_with_full_charts": full_charts,

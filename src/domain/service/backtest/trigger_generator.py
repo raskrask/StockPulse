@@ -5,7 +5,7 @@ import time
 from collections import defaultdict
 
 class TriggerGenerator:
-    def __init__(self, test_term, use_cache=True):
+    def __init__(self, test_term, use_cache=False):
         self.test_term = test_term
         self.use_cache = use_cache
         self.timer_map = defaultdict(float)
@@ -15,7 +15,6 @@ class TriggerGenerator:
         フィルター条件に基づいて、売買トリガー（シグナル）を生成する
         test_range: バックテストする期間を指定
         """
-
         if self.use_cache and (cached := load_backend_trigger(record.symbol)) is not None:
             return cached
 
@@ -27,7 +26,7 @@ class TriggerGenerator:
             self.timer_map[f.key] += (time.perf_counter() - start)
 
             record.values[f.key] = current
-            flags = [a and b for a, b in zip(flags, current)]
+            flags = [(a and b) for a, b in zip(flags, current)]
             if not any(flags):
                 break
 

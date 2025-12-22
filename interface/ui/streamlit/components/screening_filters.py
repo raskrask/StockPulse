@@ -31,7 +31,7 @@ def screening_filters(component):
         min_value=-50, max_value=50, step=1,
     )
     filters["ytd_high_divergence"] = tab_trend.slider(
-        "年初来高値からの下落率(%)", key="sma_25_divytd_high_divergenceergence", value=DEFAULT_PARAMS["ytd_high_divergence"],
+        "年初来高値からの下落率(%)", key="ytd_high_divergence", value=DEFAULT_PARAMS["ytd_high_divergence"],
         min_value=-50, max_value=0, step=1,
     )
     filters["ytd_low_divergence"] = tab_trend.slider(
