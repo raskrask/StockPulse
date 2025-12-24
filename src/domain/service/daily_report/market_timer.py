@@ -5,12 +5,12 @@ from infrastructure.persistence.run_state_repository import RunStateRepository
 
 class MarketTimer:
     JST = timezone(timedelta(hours=9))
-    YORI_END   = time(9, 10, tzinfo=JST)
-    HIKE_END   = time(15, 15, tzinfo=JST)
+    YORI_END   = (9, 10)
+    HIKE_END   = (15, 15)
 
     def __init__(self):
         self.run_state_repo = RunStateRepository()
-        self.now = datetime.now(self.JST)
+        self.now = datetime.now(timezone.utc)
 
     def previous_business_day(self) -> datetime:
         """土日祝を考慮した前営業日を返す"""
@@ -21,27 +21,31 @@ class MarketTimer:
                 return datetime.combine(d, time())
 
     def baseline_time(self) -> datetime:
-        """ '実行すべき基準日' を返す"""
+        now = self.now.astimezone(self.JST)
 
-        # 休日の場合 → 前営業日を基準にする
-        if self.now.weekday() >= 5 or jpholiday.is_holiday(self.now):
+        # 休日 → 前営業日 00:00 JST
+        if now.weekday() >= 5 or jpholiday.is_holiday(now.date()):
             return self.previous_business_day()
-        
-        # 当日の場合には現在時刻から寄り引き時間に応じて実行
-        if self.HIKE_END <= self.now.timetz():
-            return datetime.combine(self.now, self.HIKE_END)
-        elif self.HIKE_END <= self.now.timetz():
-            return datetime.combine(self.now, self.HIKE_END)
-        else:
-            return self.now.replace(hour=0, minute=0)
 
+        yori_end_dt = now.replace(hour=self.YORI_END[0], minute=self.YORI_END[1], second=0, microsecond=0)
+        hike_end_dt = now.replace(hour=self.HIKE_END[0], minute=self.HIKE_END[1], second=0, microsecond=0)
+
+        # 引け後
+        if now >= hike_end_dt:
+            return hike_end_dt
+
+        # 寄り前
+        if now < yori_end_dt:
+            return now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # 場中
+        return yori_end_dt
 
     def should_run(self) -> bool:
         state = self.run_state_repo.load()
         last_run_at = state.get(f"last_run_at")
         if last_run_at is None:
             return True
-        last_run_at = last_run_at.replace(tzinfo=self.JST)
 
         baseline = self.baseline_time()
 

@@ -15,12 +15,12 @@ from domain.model.indicator.fundamental.reject_ipo_indicator import RejectIpoInd
 
 class ScreenBuilder:
 
-    def build_default_indicators(self) -> list:
+    def build_default_indicators(self, params: dict) -> list:
         # デフォルトインジゲーターの設定
         return [
-            ListedStockIndicator(), 
-            TrendIndicator(), 
-            RejectIpoIndicator()
+            ListedStockIndicator(params), 
+            TrendIndicator(params), 
+            RejectIpoIndicator(params)
         ]
     
     """
@@ -47,11 +47,7 @@ class ScreenBuilder:
     """
     def build_indicators(self, params: dict) -> list:
         # デフォルトインジゲーターの設定
-        result = [
-            ListedStockIndicator(params), 
-            TrendIndicator(params), 
-            RejectIpoIndicator(params)
-        ]
+        result = self.build_default_indicators(params)
 
         indicators = {
             "marketCap": lambda key, v: MarketCapIndicator(key, [x * 1_000_000 for x in v]),

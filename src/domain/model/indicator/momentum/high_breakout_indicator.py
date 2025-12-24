@@ -35,7 +35,7 @@ class HighBreakoutIndicator(BaseIndicator):
         else:
             bottom_max = highs.iloc[-(self.bottom_term + 1):-(self.break_term + 1)].max()
             break_max = highs.iloc[-(self.break_term + 1):].max()
-    
+
         record.values[self.key] = [break_max, past_max, bottom_max]
 
         return (break_max > past_max) and (past_max > bottom_max)

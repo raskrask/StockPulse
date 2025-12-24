@@ -13,7 +13,7 @@ class ChangeSignalDetector:
                 current = f.batch_apply(record, days)
                 record.values[f.key] = current
                 if len(current) < days:
-                    raise Exception(f"Error ChangeSignalDetector:{record.symbol} {f.key}")
+                    raise Exception(f"Error ChangeSignalDetector:{record.symbol} {f.key} {len(current)}")
                 flags = [a and b for a, b in zip(flags, current)]
                 if not any(flags):
                     break

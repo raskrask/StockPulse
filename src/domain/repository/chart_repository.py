@@ -31,8 +31,6 @@ class ChartRepository:
 
         # Step2: キャッシュで不足している範囲を検出
         df_cached = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
-        df_cached = df_cached.set_index("date", drop=False).sort_index()
-
         missing_months = self._detect_missing_ranges(df_cached, from_date, to_date)
 
         # Step3: 不足分だけ Yahooから取得
@@ -48,8 +46,9 @@ class ChartRepository:
         return final.loc[mask]
     
     def _detect_missing_ranges(self, df_cached, from_date, to_date):
-        start = from_date.replace(day=1)
-        all_months = pd.date_range(start=start, end=to_date, freq="MS")
+        start = pd.Timestamp(from_date).normalize().replace(day=1)
+        end = pd.Timestamp(to_date).normalize() + pd.offsets.MonthEnd(0)
+        all_months = pd.date_range(start=start, end=end, freq="MS")
         if df_cached is None or df_cached.empty:
             return all_months
 

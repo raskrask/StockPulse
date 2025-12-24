@@ -26,6 +26,9 @@ info = record.get_stock_info()
 st.write("時価総額", "{:,}".format(info['marketCap']))
 st.write("初回取引日時", pd.to_datetime(info['firstTradeDateMilliseconds'], unit="ms"))
 
+st.write("PER", info['trailingPE'])
+st.write("PBR", info['priceToBook'])
+
 #@st.cache_data(ttl=3600)
 def fetch_yf_cache(mode: str, symbol: str, start: datetime):
     if mode == "weekly":

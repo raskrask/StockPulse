@@ -16,9 +16,8 @@ class StockRepository:
         chart_repo = ChartRepository()
 
         stocks = [StockRecord(sheet.row(i+1), self, chart_repo) for i in range(total)]
-#        stocks = [s for s in stocks if ListedStockIndicator(params).apply(s)]
         #stocks = stocks[1040:1140]  # テスト用に行数を減らす
-        fitlers = ScreenBuilder().build_default_indicators()
+        fitlers = ScreenBuilder().build_default_indicators(params)
         for f in fitlers:
             stocks = [s for s in stocks if f.apply(s)]
 

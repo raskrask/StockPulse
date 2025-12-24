@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from infrastructure.util.io_utils import BASE_DIR
 
 class RunStateRepository:
@@ -26,7 +26,7 @@ class RunStateRepository:
     def save(self, state: dict):
         serializable = {}
         for key, value in state.items():
-            serializable[key] = value.isoformat() if value else None
+            serializable[key] = value.astimezone(timezone.utc).isoformat() if value else None
 
         with open(self.FILE_PATH, "w") as f:
             json.dump(serializable, f, indent=2)

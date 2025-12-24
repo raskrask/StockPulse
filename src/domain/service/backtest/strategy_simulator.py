@@ -4,7 +4,7 @@ import infrastructure.util.debug as debug
 
 
 class StrategySimulator:
-    def __init__(self, test_term, use_cache=True):
+    def __init__(self, test_term, use_cache=False):
         self.test_term = test_term
         self.use_cache = use_cache
 
