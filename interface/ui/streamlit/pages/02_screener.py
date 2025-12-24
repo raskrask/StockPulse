@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.column_config import LinkColumn
 import pandas as pd
 from ui.streamlit.components import screening_filters, set_screening_params, StreamlitProgressReporter
 from application.screening_usecase import ScreeningUsecase
@@ -28,5 +29,15 @@ if st.sidebar.button("スクリーニングを実行"):
     if screen_stocks:
         symbols = " ".join(s['symbol'] for s in screen_stocks)
         st.markdown(f"検索結果({len(screen_stocks)})件：`{symbols}`")
-        df = pd.DataFrame(screen_stocks).set_index('symbol')
+        df = pd.DataFrame(screen_stocks).set_index('symbol', drop=False)
+        df["symbol_url"] = df["symbol"].apply(
+            lambda x: f"insight?symbol={x}"
+        )
+        column_config = {
+            "symbol_url": LinkColumn(
+                label="銘柄詳細",
+                display_text="銘柄を見る"
+            )
+        }
+        st.dataframe( df, column_config=column_config )
         st.write(screen_stocks)

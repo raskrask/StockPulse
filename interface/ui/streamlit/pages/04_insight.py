@@ -11,7 +11,9 @@ from domain.repository.stock_repository import StockRepository
 st.set_page_config(page_title="StockPulse Insight", layout="wide")
 st.title("🔍 銘柄詳細")
 
-symbol = st.text_input("銘柄コードを入力 (例: 7203.T)", "7203.T")
+params = st.query_params
+
+symbol = st.text_input("銘柄コードを入力 (例: 7203.T)", params.get("symbol", "7203.T"))
 
 repo = StockRepository()
 record = repo.get_stock_by_symbol(symbol)
