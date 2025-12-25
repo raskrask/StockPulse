@@ -18,10 +18,14 @@ symbol = st.text_input("銘柄コードを入力 (例: 7203.T)", params.get("sym
 repo = StockRepository()
 record = repo.get_stock_by_symbol(symbol)
 
-st.write("銘柄名:", record.rawdata[2].value)
-st.write("市場:", record.rawdata[3].value)
-st.write("業種:", record.rawdata[7].value)
-st.write("規模:", record.rawdata[9].value)
+if record is None:
+    st.error("指定した銘柄が見つかりませんでした。")
+    st.stop()
+
+st.write("銘柄名:", record.name)
+st.write("市場:", record.market)
+st.write("業種:", record.get_industry())
+st.write("規模:", record.get_scale())
 
 start = datetime.today() - timedelta(days=365)
 info = record.get_stock_info()
@@ -43,7 +47,7 @@ def fetch_yf_cache(mode: str, symbol: str, start: datetime):
 
 
 # 日足
-df_daily = fetch_yf_cache("daily", symbol, start)
+df_daily = fetch_yf_cache("daily", record.symbol, start)
 
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.7, 0.3], vertical_spacing=0.05)
 
@@ -57,13 +61,13 @@ st.plotly_chart(fig, use_container_width=True)
 
 
 # 週足
-df_weekly = fetch_yf_cache("weekly", symbol, start)
+df_weekly = fetch_yf_cache("weekly", record.symbol, start)
 st.subheader("週足")
 st.write(df_weekly.tail())
 st.line_chart(df_weekly.set_index("date")["close"])
 
 # 月足
-df_monthly = fetch_yf_cache("monthly", symbol, start)
+df_monthly = fetch_yf_cache("monthly", record.symbol, start)
 st.subheader("月足")
 st.write(df_monthly.tail())
 st.line_chart(df_monthly.set_index("date")["close"])
@@ -125,4 +129,3 @@ st.plotly_chart(fig, use_container_width=True)
 
 
 st.write(result)
-

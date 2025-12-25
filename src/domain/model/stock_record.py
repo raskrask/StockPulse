@@ -11,9 +11,16 @@ class StockRecord:
         self.stock_repo = stock_repo
         self.chart_repo = chart_repo
 
-        self.symbol = str(row[1].value).split(".")[0] + ".T"  # 銘柄コード
-        self.name = row[2].value  # 銘柄名
-        self.market = row[3].value  # 市場
+        if isinstance(row, dict):
+            self.symbol = row.get("symbol", "")
+            self.name = row.get("name", "")
+            self.market = row.get("market", "")
+            self.market_type = "US"
+        else:
+            self.symbol = str(row[1].value).split(".")[0] + ".T"  # 銘柄コード
+            self.name = row[2].value  # 銘柄名
+            self.market = row[3].value  # 市場
+            self.market_type = "JP"
 
         self.info = None  # 銘柄情報キャッシュ
         self.values = {}
@@ -48,6 +55,17 @@ class StockRecord:
         if not info or 'marketCap' not in info:
             return None
         return info['marketCap']
+
+    def get_industry(self):
+        if self.market_type == "JP":
+            return self.rawdata[7].value
+        info = self.get_stock_info()
+        return info.get("industry", "-") if info else "-"
+
+    def get_scale(self):
+        if self.market_type == "JP":
+            return self.rawdata[9].value
+        return "-"
     
     def get_stock_first_trade_date(self):
         info = self.get_stock_info()
@@ -105,5 +123,3 @@ class StockRecord:
         start = datetime.today() - timedelta(days=days)
         self.yf_yearly = self.chart_repo.load_daily_range(self.symbol, start, datetime.today())
         return self.yf_yearly[-days:]
-
-
