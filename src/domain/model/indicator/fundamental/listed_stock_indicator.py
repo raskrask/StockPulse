@@ -11,12 +11,12 @@ class ListedStockIndicator(BaseIndicator):
 
     def __init__(self, params: dict = {}, market: list[str] = []):
         super().__init__("listed_stock")
-        self.stockNumbers = params.get('stockNumbers', '').strip().split(' ')
+        self.stockNumbers = params.get('stockNumbers', '').strip().split()
         self.target_market = params.get("target_market")
         self.market = market + self.TARGET_MARKETS
 
     def apply(self, record: StockRecord) -> bool:
-        if self.stockNumbers and record.symbol not in self.stockNumbers:
+        if len(self.stockNumbers) > 0 and record.symbol not in self.stockNumbers:
             return False
         if record.symbol in self.IGNORE_STOKS:
             return False
