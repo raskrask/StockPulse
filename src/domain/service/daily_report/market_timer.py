@@ -1,14 +1,32 @@
 from datetime import datetime, time, timedelta, timezone
+from zoneinfo import ZoneInfo
 import jpholiday
 from infrastructure.persistence.run_state_repository import RunStateRepository
 
 
 class MarketTimer:
-    JST = timezone(timedelta(hours=9))
-    YORI_END   = (9, 10)
-    HIKE_END   = (15, 15)
+    MARKET_CONFIG = {
+        "JP": {
+            "tz": ZoneInfo("Asia/Tokyo"),
+            "yori_end": (9, 10),
+            "hike_end": (15, 15),
+            "holiday_fn": lambda d: jpholiday.is_holiday(d),
+        },
+        "US": {
+            "tz": ZoneInfo("America/New_York"),
+            "yori_end": (9, 35),
+            "hike_end": (16, 5),
+            "holiday_fn": lambda d: False,
+        },
+    }
 
-    def __init__(self):
+    def __init__(self, market: str = "JP"):
+        config = self.MARKET_CONFIG.get(market, self.MARKET_CONFIG["JP"])
+        self.market = market
+        self.tz = config["tz"]
+        self.yori_end = config["yori_end"]
+        self.hike_end = config["hike_end"]
+        self.is_holiday = config["holiday_fn"]
         self.run_state_repo = RunStateRepository()
         self.now = datetime.now(timezone.utc)
 
@@ -17,16 +35,16 @@ class MarketTimer:
         d = target_date.date()
         while True:
             d = d + timedelta(days=1)
-            if d.weekday() < 5 and not jpholiday.is_holiday(d):
-                return datetime.combine(d, time(self.YORI_END[0], self.YORI_END[1]), tzinfo=self.JST)
+            if d.weekday() < 5 and not self.is_holiday(d):
+                return datetime.combine(d, time(self.yori_end[0], self.yori_end[1]), tzinfo=self.tz)
 
     def baseline_time(self, last_run_at: datetime) -> datetime:
-        baseline = last_run_at.astimezone(self.JST)
-        yori_end_dt = baseline.replace(hour=self.YORI_END[0], minute=self.YORI_END[1], second=0, microsecond=0)
-        hike_end_dt = baseline.replace(hour=self.HIKE_END[0], minute=self.HIKE_END[1], second=0, microsecond=0)
+        baseline = last_run_at.astimezone(self.tz)
+        yori_end_dt = baseline.replace(hour=self.yori_end[0], minute=self.yori_end[1], second=0, microsecond=0)
+        hike_end_dt = baseline.replace(hour=self.hike_end[0], minute=self.hike_end[1], second=0, microsecond=0)
 
         # 休日 → 翌営業日 寄り後
-        if baseline.weekday() >= 5 or jpholiday.is_holiday(baseline.date()):
+        if baseline.weekday() >= 5 or self.is_holiday(baseline.date()):
             return self.next_business_day(baseline)
 
         # 引け後
@@ -42,19 +60,22 @@ class MarketTimer:
 
     def should_run(self) -> bool:
         state = self.run_state_repo.load()
+
         last_run_at = state.get(f"last_run_at")
         if last_run_at is None:
             return True
 
         baseline = self.baseline_time(last_run_at)
-        now_jst = self.now.astimezone(self.JST)
+        now_local = self.now.astimezone(self.tz)
 
         # 基準日より前の実行であれば → 未実行として実行
-        return now_jst > baseline
+        return now_local > baseline
 
 
-    def mark_executed(self):
-        state = self.run_state_repo.load()
+    @classmethod
+    def mark_executed(cls):
+        run_state_repo = RunStateRepository()
+        state = run_state_repo.load()
 
-        state[f"last_run_at"] = self.now
-        self.run_state_repo.save(state)
+        state[f"last_run_at"] = datetime.now(timezone.utc)
+        run_state_repo.save(state)

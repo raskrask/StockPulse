@@ -21,6 +21,7 @@ indices = {
     "日経平均": "^N225",
     "米10年国債利回り": "^TNX",
     "ドル円": "JPY=X",
+    "VIX": "^VIX",
 }
 
 start = datetime.today()
@@ -62,6 +63,13 @@ for i, (name, symbol) in enumerate(indices.items()):
             comment = "長期・中期ともに右肩下がり ❌"
         else:
             comment = "方向感なし ➖"
+
+        if name == "VIX":
+            # VIXは逆張り指標として解釈
+            if upward_13w and upward_12m:
+                comment = "（恐怖指数）長期・中期ともに上昇中 ❌"
+            elif downward_13w:
+                comment = "（恐怖指数）リスク下降中 ✅"
 
         market_card(
             title=name,

@@ -45,13 +45,14 @@ def save_parquet(path: str, df: pd.DataFrame):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         df.to_parquet(path, index=False)
 
-def save_json(path: str, data: dict):
+def save_json(path: str, data):
     """
     JsonデータをS3またはローカルに保存
     """
-    for k, v in data.items():
-        if isinstance(v, pd.Timestamp):
-            data[k] = v.isoformat()     # "2025-12-02T09:30:00"
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, pd.Timestamp):
+                data[k] = v.isoformat()     # "2025-12-02T09:30:00"
 
     json_str = json.dumps(data).encode("utf-8")
     if STORAGE_BACKEND.startswith("s3"):
@@ -112,7 +113,7 @@ def load_json(path: str) -> dict | None:
             path = os.path.join(BASE_DIR, path)
             if os.path.exists(path):
                 data = json.load(open(path, "r"))
-                if 'date' in data:
+                if isinstance(data, dict) and 'date' in data:
                     #data['date'] = datetime.strptime(data['date'], "%Y-%m-%dT%H:%M:%S")
                     data["date"] = datetime.fromisoformat(data["date"])
 

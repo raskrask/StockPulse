@@ -17,16 +17,22 @@ class DailyReportUsecase:
 
     def generate_buy_signals(self, name=None) -> str:
         """買い時株レポートを生成する"""
-        timer = MarketTimer()
-        if not timer.should_run():
-            print("Skip: not the right time or already executed.")
-            return
 
         # ① 通知Screening条件を取得
-        profiles = [self.profile_repo.load(p) for p in self.profile_repo.list_profiles()]
-        profiles = [p for p in profiles if p["notify"]]
-        if name is not None:
-            profiles = [p for p in profiles if p["name"] == name]
+        profiles = []
+        for p in self.profile_repo.list_profiles():
+            profile = self.profile_repo.load(p)
+            if not profile["notify"]:
+                continue
+            market = profile["filters"].get("target_market", "JP")
+            if not MarketTimer(market).should_run():
+                continue
+            if name is not None and profile["name"] != name:
+                continue
+            profiles.append(profile)
+        if not profiles:
+            print("No profiles to process.")
+            return
 
         # ② repository から銘柄一覧を取得
         stocks = self.stock_repo.list_all_stocks()
@@ -40,5 +46,5 @@ class DailyReportUsecase:
 
             result.append({ "profile": p, "trigger": triggers })
 
-        timer.mark_executed()
+        MarketTimer.mark_executed()
         return result

@@ -13,6 +13,7 @@ DEFAULT_PARAMS ={
     "ueno_theory_signal": False,
     "marketCap": (30000, 60000000),
     "avgTradingValue": (300000, 600000000),
+    "target_market": "JP",
 }
 
 def screening_filters(component):
@@ -66,6 +67,14 @@ def screening_filters(component):
 
     # --- tab_fundamental
     filters["stockNumbers"] = tab_fundamental.text_input("銘柄コード", key="stockNumbers")
+    market_labels = {"JP": "日本株", "US": "米国株（S&P 500）"}
+    filters["target_market"] = tab_fundamental.selectbox(
+        "対象市場",
+        options=list(market_labels.keys()),
+        key="target_market",
+        format_func=lambda k: market_labels.get(k, k),
+        index=list(market_labels.keys()).index(DEFAULT_PARAMS["target_market"]),
+    )
     filters["marketCap"] = tab_fundamental.slider(
         "時価総額（百万円）", key="marketCap", value=DEFAULT_PARAMS["marketCap"], 
         min_value=0, max_value=60_000_000, step=1_000,
@@ -81,6 +90,7 @@ def screening_filters(component):
 def set_screening_params(params):
     new_params = DEFAULT_PARAMS | params 
     st.session_state.stockNumbers = new_params.get("stockNumbers","")
+    st.session_state.target_market = new_params.get("target_market")
     st.session_state.sma_75_200_divergence = new_params.get("sma_75_200_divergence")
     st.session_state.sma_25_divergence = new_params.get("sma_25_divergence")
     st.session_state.ytd_high_divergence = new_params.get("ytd_high_divergence")
