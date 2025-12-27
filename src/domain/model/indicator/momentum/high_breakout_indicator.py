@@ -16,7 +16,7 @@ class HighBreakoutIndicator(BaseIndicator):
         self.is_active = self.bottom_term != -1
         self.high_term = high_term
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         if not self.is_active:
             return True
 
@@ -41,7 +41,7 @@ class HighBreakoutIndicator(BaseIndicator):
         return (break_max > past_max) and (past_max > bottom_max)
 
 
-    def batch_apply(self, record, days: int) -> list[bool]:
+    def screen_range(self, record, days: int) -> list[bool]:
         if not self.is_active:
             return [True] * days
 

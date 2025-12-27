@@ -33,6 +33,7 @@ class StockRecord:
 
         self._memory_cache_days = None
         self._memory_days = -1
+        self._memory_days_forced = False
 
     def get_values(self):
         return {
@@ -76,6 +77,8 @@ class StockRecord:
     # 日足チャートを指定営業日数分取得する
     def get_daily_chart_by_days(self, days):
         # 期間範囲ならメモリから返す
+        if self._memory_cache_days is not None and self._memory_days_forced:
+            return self._memory_cache_days[-days:]
         if self._memory_days >= days:
             return self._memory_cache_days[-days:]
 
@@ -98,6 +101,10 @@ class StockRecord:
         if self._memory_range == (from_date, to_date):
             return self._memory_cache
 
+        first_trade_date = self.get_stock_first_trade_date()
+        if first_trade_date is not None:
+            from_date = max(from_date, first_trade_date)
+
         # Repositoryから取得（キャッシュ or Yahoo ）
         df = self.chart_repo.load_daily_range(self.symbol, from_date, to_date)
 
@@ -106,6 +113,19 @@ class StockRecord:
         self._memory_range = (from_date, to_date)
 
         return df
+
+    def set_daily_chart_days_cache(self, df, force: bool = False):
+        if df is None:
+            self._memory_cache_days = None
+            self._memory_days = -1
+            self._memory_days_forced = False
+            return
+        self._memory_cache_days = df
+        self._memory_days = len(df)
+        self._memory_days_forced = force
+
+    def get_cached_daily_chart(self):
+        return self._memory_cache_days
 
     def recent_yf_monthly(self):
         if self.yf_daily is not None:

@@ -9,7 +9,7 @@ class UenoTheoryIndicator(BaseIndicator):
         self.logic = UenoTheory()
         self.is_active = is_active
 
-    def apply(self, record) -> bool:
+    def screen_now(self, record) -> bool:
         if not self.is_active:
             return True
 
@@ -20,7 +20,7 @@ class UenoTheoryIndicator(BaseIndicator):
 
         return df["ueno_theory_signal"].iloc[-1]
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         if not self.is_active:
             return [True] * days
 

@@ -8,10 +8,10 @@ class RejectIpoIndicator(BaseIndicator):
     def __init__(self, params: dict = {}):
         super().__init__("reject_ipo")
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         return not self._reject_ipo_stock(record)
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         result = self._reject_firstTradeDate(record, days)
         return [not result] * days
 

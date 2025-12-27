@@ -14,7 +14,7 @@ class TrendIndicator(BaseIndicator):
         super().__init__("trend")
         self.repo = ChartRepository()
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         if self.vix_risk is None:
             today = datetime.today()
             start = today - timedelta(days=7) # 休日のVIXは取得できない場合あり
@@ -23,7 +23,7 @@ class TrendIndicator(BaseIndicator):
 
         return self.vix_risk.iloc[-1]
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         if self.vix_risk is None:
             today = datetime.today()
             start = today - timedelta(days=days*1.5+7) # 休日のVIXは取得できない場合あり

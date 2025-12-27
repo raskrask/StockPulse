@@ -15,7 +15,7 @@ class PriceChangeIndicator(BaseIndicator):
         self.max_value = value_range[1]
         self.days = days
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         df = record.recent_yf_yearly()
         if df.empty:
             return False
@@ -33,7 +33,7 @@ class PriceChangeIndicator(BaseIndicator):
 
         return self.min_value <= change <= self.max_value
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
 
         df = record.get_daily_chart_by_days(days+self.days)
         if df.empty:

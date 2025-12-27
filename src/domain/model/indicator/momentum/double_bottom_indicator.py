@@ -8,7 +8,7 @@ class DoubleBottomIndicator(BaseIndicator):
         super().__init__(key)
         self.is_active = is_active
 
-    def apply(self, record) -> bool:
+    def screen_now(self, record) -> bool:
         if not self.is_active:
             return True
 
@@ -18,7 +18,7 @@ class DoubleBottomIndicator(BaseIndicator):
 
         return signal["signal"]
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         if not self.is_active:
             return [True] * days
 

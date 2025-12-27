@@ -11,7 +11,7 @@ class ScreenExecutor:
 
         for i, record in enumerate(stocks):
             self.progress.report((i + 1) / total, f"Screening {record.symbol}")
-            if all(f.apply(record) for f in filters):
+            if all(f.screen_now(record) for f in filters):
                 result.append(record)
 
         return result

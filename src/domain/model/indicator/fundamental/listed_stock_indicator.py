@@ -5,27 +5,28 @@ from infrastructure.yahoo.yf_fetcher import fetch_yf_info
 import pandas as pd
 
 class ListedStockIndicator(BaseIndicator):
-    TARGET_MARKETS = ["プライム（内国株式）", "スタンダード（内国株式）", "グロース（内国株式）"]
-    US_MARKETS = ["NASDAQ", "NYSE", "NYSE American", "NYSE Arca", "BATS", "IEX", "US"]
+    JP_MARKETS = ["プライム（内国株式）", "スタンダード（内国株式）", "グロース（内国株式）"]
+    US_MARKETS = ["S&P 500", "NASDAQ", "NYSE", "NYSE American", "NYSE Arca", "BATS", "IEX", "US"]
     IGNORE_STOKS = ["9023.T"]
 
     def __init__(self, params: dict = {}, market: list[str] = []):
         super().__init__("listed_stock")
         self.stockNumbers = params.get('stockNumbers', '').strip().split()
-        self.target_market = params.get("target_market")
-        self.market = market + self.TARGET_MARKETS
+        self.target_market = params.get("target_market", ["US", "JP"])
+        self.market = market
+        self.market.extend(self.JP_MARKETS if "JP" in self.target_market else [])
+        self.market.extend(self.US_MARKETS if "US" in self.target_market else [])
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         if len(self.stockNumbers) > 0 and record.symbol not in self.stockNumbers:
             return False
         if record.symbol in self.IGNORE_STOKS:
             return False
 
-        if self.target_market == "US":
-            return record.market_type == "US"
-        if record.market_type != "JP":
+        if not record.market_type in self.target_market:
             return False
+
         return record.market in self.market
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
-        return [self.apply(record)] * days
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
+        return [self.screen_now(record)] * days

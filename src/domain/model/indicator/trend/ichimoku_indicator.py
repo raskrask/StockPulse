@@ -8,7 +8,7 @@ class IchimokuIndicator(BaseIndicator):
         super().__init__(key)
         self.is_active = is_active
 
-    def apply(self, record) -> bool:
+    def screen_now(self, record) -> bool:
         if not self.is_active:
             return True
 
@@ -19,7 +19,7 @@ class IchimokuIndicator(BaseIndicator):
 
         return record.values[self.key]
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         if not self.is_active:
             return [True] * days
 

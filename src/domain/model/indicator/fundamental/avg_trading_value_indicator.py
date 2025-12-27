@@ -7,7 +7,7 @@ class AvgTradingValueIndicator(BaseIndicator):
         self.min_value = value[0]
         self.max_value = value[1]
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         df = record.recent_yf_monthly()
         if df is None or df.empty:   
             return False
@@ -16,7 +16,7 @@ class AvgTradingValueIndicator(BaseIndicator):
 
         return self.min_value <= trading_value <= self.max_value
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         df = record.get_daily_chart_by_days(days+20)
         if df is None or df.empty:
             return False

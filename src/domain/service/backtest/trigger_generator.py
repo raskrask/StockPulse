@@ -22,7 +22,7 @@ class TriggerGenerator:
 
         for f in filters:
             start = time.perf_counter()
-            current = f.batch_apply(record, self.test_term)
+            current = f.screen_range(record, self.test_term)
             self.timer_map[f.key] += (time.perf_counter() - start)
 
             record.values[f.key] = current

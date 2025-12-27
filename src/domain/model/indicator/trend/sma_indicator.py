@@ -13,7 +13,7 @@ class SmaIndicator(BaseIndicator):
         self.period1 = period1
         self.period2 = period2
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
 
         df = record.recent_yf_yearly()
         if df.empty:
@@ -30,7 +30,7 @@ class SmaIndicator(BaseIndicator):
 
         return self.min_value <= ratio <= self.max_value
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
         period = max(self.period1 or 0, self.period2 or 0)
         df = record.get_daily_chart_by_days(days + period)
         if df.empty:

@@ -9,7 +9,7 @@ class MarketCapIndicator(BaseIndicator):
         self.min_cap = cap[0]
         self.max_cap = cap[1]
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         market_cap = record.get_stock_market_cap()
 
         if market_cap is None:
@@ -17,5 +17,5 @@ class MarketCapIndicator(BaseIndicator):
 
         return self.min_cap <= market_cap <= self.max_cap
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
-        return [self.apply(record)] * days
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
+        return [self.screen_now(record)] * days
