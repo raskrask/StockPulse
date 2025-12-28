@@ -15,12 +15,12 @@ class StockRepository:
         target_market = params.get("target_market")
 
         stocks = []
-        if target_market in (None, "JP"):
+        if target_market in (None, "JP", "ALL"):
             jpx = JPXListingFetcher()
             sheet = jpx.fetch_workbook().sheet_by_index(0)
             total = sheet.nrows-1
             stocks.extend([StockRecord(sheet.row(i+1), self, chart_repo) for i in range(total)])
-        if target_market in (None, "US"):
+        if target_market in (None, "US", "ALL"):
             us_listings = USListingFetcher().fetch_listings()
             stocks.extend([StockRecord(row, self, chart_repo) for row in us_listings])
 

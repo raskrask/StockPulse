@@ -21,6 +21,7 @@ class MarketTimer:
     }
 
     def __init__(self, market: str = "JP"):
+        if market == "ALL": market = "JP"
         config = self.MARKET_CONFIG.get(market, self.MARKET_CONFIG["JP"])
         self.market = market
         self.tz = config["tz"]

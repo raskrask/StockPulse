@@ -13,7 +13,7 @@ DEFAULT_PARAMS ={
     "ueno_theory_signal": False,
     "marketCap": (30000, 60000000),
     "avgTradingValue": (300000, 600000000),
-    "target_market": "JP",
+    "target_market": "ALL",
 }
 
 def screening_filters(component):
@@ -67,7 +67,7 @@ def screening_filters(component):
 
     # --- tab_fundamental
     filters["stockNumbers"] = tab_fundamental.text_input("銘柄コード", key="stockNumbers")
-    market_labels = {"JP": "日本株", "US": "米国株（S&P 500）"}
+    market_labels = {"ALL": "すべて", "JP": "日本株", "US": "米国株（S&P 500）"}
     filters["target_market"] = tab_fundamental.selectbox(
         "対象市場",
         options=list(market_labels.keys()),

@@ -45,6 +45,7 @@ class UenoTheory:
 
     # 出来高の多い陽線を検出（３ヶ月間で集計）
     def detect_high_volume_days(self, df, volume_ratio=1.5, cv_threshold=0.3, z_threshold=2.5):
+        df = df.copy()
 
         # 2か月間の平均と標準偏差
         vol = df['volume']

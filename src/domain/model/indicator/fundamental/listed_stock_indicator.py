@@ -9,13 +9,19 @@ class ListedStockIndicator(BaseIndicator):
     US_MARKETS = ["S&P 500", "NASDAQ", "NYSE", "NYSE American", "NYSE Arca", "BATS", "IEX", "US"]
     IGNORE_STOKS = ["9023.T"]
 
-    def __init__(self, params: dict = {}, market: list[str] = []):
+    def __init__(self, params: dict | None = None, market: list[str] | None = None):
         super().__init__("listed_stock")
-        self.stockNumbers = params.get('stockNumbers', '').strip().split()
-        self.target_market = params.get("target_market", ["US", "JP"])
-        self.market = market
-        self.market.extend(self.JP_MARKETS if "JP" in self.target_market else [])
-        self.market.extend(self.US_MARKETS if "US" in self.target_market else [])
+        params = params or {}
+        market = market or []
+        self.stockNumbers = params.get("stockNumbers", "").strip().split()
+        target_market = params.get("target_market", "ALL")
+        target_market = [target_market] if isinstance(target_market, str) else target_market
+        self.target_market = ["JP", "US"] if "ALL" in target_market else target_market
+        print(f"ListedStockIndicator target_market: {self.target_market}")
+        print(f"ListedStockIndicator target_market: {params.get('target_market')}")
+        self.market = list(market)
+        if "JP" in self.target_market: self.market.extend(self.JP_MARKETS)
+        if "US" in self.target_market: self.market.extend(self.US_MARKETS)
 
     def screen_now(self, record: StockRecord) -> bool:
         if len(self.stockNumbers) > 0 and record.symbol not in self.stockNumbers:
