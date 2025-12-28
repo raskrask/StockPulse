@@ -30,6 +30,10 @@ def save_indicator_cache_range(from_year: int, to_year: int):
     io_utils.save_json("indicator_cache_range.json", payload)
 
 
+def load_indicator_cache_range() -> dict | None:
+    return io_utils.load_json("indicator_cache_range.json")
+
+
 def clear_indicator_cache() -> int:
     if io_utils.STORAGE_BACKEND.startswith("s3"):
         return 0
