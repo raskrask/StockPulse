@@ -34,20 +34,15 @@ def load_indicator_cache_range() -> dict | None:
     return io_utils.load_json("indicator_cache_range.json")
 
 
-def clear_indicator_cache() -> int:
+def clear_indicator_cache(keep_from_year: int, keep_to_year: int):
     if io_utils.STORAGE_BACKEND.startswith("s3"):
-        return 0
+        return
 
     base_dir = Path(io_utils.BASE_DIR)
-    deleted = 0
+    keep_name = f"{keep_from_year}_{keep_to_year}.parquet"
     for path in base_dir.glob("*/backtest/indicators/batch/*.parquet"):
         if path.is_file():
+            if path.name == keep_name:
+                continue
             path.unlink()
-            deleted += 1
 
-    summary_path = base_dir / "indicator_cache_range.json"
-    if summary_path.exists():
-        summary_path.unlink()
-        deleted += 1
-
-    return deleted
