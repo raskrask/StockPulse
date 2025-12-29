@@ -78,7 +78,7 @@ from domain.model.analysis.technical.ueno_theory import UenoTheory
 
 ueno_theory = UenoTheory()
 df = record.get_daily_chart_by_days(ueno_theory.window_size+20)
-result = ueno_theory.add_ueno_theory_signal(df)
+df = ueno_theory.add_ueno_theory_signal(df)
 
 fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.7, 0.3], vertical_spacing=0.05)
 
@@ -129,7 +129,7 @@ fig.update_layout(title="出来高", xaxis_rangeslider_visible=False)
 st.plotly_chart(fig, use_container_width=True)
 
 
-st.write(result)
+st.write(df)
 
 cache_range = load_indicator_cache_range()
 if cache_range:
