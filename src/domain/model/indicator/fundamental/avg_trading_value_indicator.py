@@ -17,10 +17,12 @@ class AvgTradingValueIndicator(BaseIndicator):
         return self.min_value <= trading_value <= self.max_value
 
     def screen_range(self, record: StockRecord, days) -> list[bool]:
-        df = record.get_daily_chart_by_days(days+20)
-        if df is None or df.empty:
-            return False
-        trading_value = ((df['close'] * df['volume']).rolling(20).mean())
-        flags = trading_value.between(self.min_value, self.max_value)
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_value <= v <= self.max_value for v in values]
 
-        return flags[-days:]
+    def calc_series(self, record: StockRecord, days):
+        df = record.get_daily_chart_by_days(days + 20)
+        if df is None or df.empty:
+            return []
+        trading_value = ((df['close'] * df['volume']).rolling(20).mean())
+        return trading_value.tolist()[-days:]

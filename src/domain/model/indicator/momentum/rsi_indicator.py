@@ -29,12 +29,13 @@ class RsiIndicator(BaseIndicator):
         return self.min_value <= rsi <= self.max_value
 
     def screen_range(self, record: StockRecord, days) -> list[bool]:
-        df = record.get_daily_chart_by_days(days+14)
-        if df.empty:
-            return False
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_value <= v <= self.max_value for v in values]
 
+    def calc_series(self, record: StockRecord, days):
+        df = record.get_daily_chart_by_days(days + 14)
+        if df.empty:
+            return []
         close = df["close"].astype(float).values
         rsi = talib.RSI(close, timeperiod=14)
-        flags = [self.min_value <= v <= self.max_value for v in rsi]
-
-        return flags[-days:]
+        return list(rsi)[-days:]

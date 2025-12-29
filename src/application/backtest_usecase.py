@@ -51,4 +51,3 @@ class BacktestUsecase:
         metrics["timer"] = { k: v for k, v in sorted(self.trigger_generator.timer_map.items(), key=lambda x: x[1], reverse=True) }
         
         return metrics
-

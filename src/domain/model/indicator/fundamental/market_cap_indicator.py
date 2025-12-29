@@ -18,4 +18,11 @@ class MarketCapIndicator(BaseIndicator):
         return self.min_cap <= market_cap <= self.max_cap
 
     def screen_range(self, record: StockRecord, days) -> list[bool]:
-        return [self.screen_now(record)] * days
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_cap <= v <= self.max_cap for v in values]
+
+    def calc_series(self, record: StockRecord, days):
+        market_cap = record.get_stock_market_cap()
+        if market_cap is None:
+            return [None] * days
+        return [market_cap] * days

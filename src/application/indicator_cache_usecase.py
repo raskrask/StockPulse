@@ -70,9 +70,9 @@ class IndicatorCacheUsecase:
         effective_days = len(df)
         for indicator in indicators:
             values = indicator.apply_batch(record)
-            values_list = [bool(v) for v in list(values)]
+            values_list = list(values)
             if len(values_list) < effective_days:
-                values_list = ([False] * (effective_days - len(values_list))) + values_list
+                values_list = ([None] * (effective_days - len(values_list))) + values_list
             else:
                 values_list = values_list[-effective_days:]
             df[indicator.key] = values_list

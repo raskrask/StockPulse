@@ -34,6 +34,16 @@ def load_indicator_cache_range() -> dict | None:
     return io_utils.load_json("indicator_cache_range.json")
 
 
+def load_cached_indicator_df(symbol: str):
+    cache_range = load_indicator_cache_range()
+    if not cache_range:
+        return None
+    df = load_indicator_batch(symbol, cache_range["from_year"], cache_range["to_year"])
+    if df is None or df.empty:
+        return None
+    return df
+
+
 def clear_indicator_cache(keep_from_year: int, keep_to_year: int):
     if io_utils.STORAGE_BACKEND.startswith("s3"):
         return
@@ -45,4 +55,3 @@ def clear_indicator_cache(keep_from_year: int, keep_to_year: int):
             if path.name == keep_name:
                 continue
             path.unlink()
-

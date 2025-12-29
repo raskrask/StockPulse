@@ -13,36 +13,19 @@ class SmaIndicator(BaseIndicator):
         self.period1 = period1
         self.period2 = period2
 
-    def screen_now(self, record: StockRecord) -> bool:
-
-        df = record.recent_yf_yearly()
-        if df.empty:
-            return False
-
-        sma1 = talib.SMA(df["close"].astype(float).values, timeperiod=self.period1)[-1]
-        if self.period2:
-            sma2 = talib.SMA(df["close"].astype(float).values, timeperiod=self.period2)[-1]
-        else:
-            sma2 = df["close"].iloc[-1]
-        ratio = (sma1 - sma2) / sma2 * 100
-
-        record.values[self.key] = [ratio, sma1, sma2, self.min_value, self.max_value]
-
-        return self.min_value <= ratio <= self.max_value
-
     def screen_range(self, record: StockRecord, days) -> list[bool]:
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_value <= v <= self.max_value for v in values]
+
+    def calc_series(self, record: StockRecord, days):
         period = max(self.period1 or 0, self.period2 or 0)
         df = record.get_daily_chart_by_days(days + period)
         if df.empty:
-            return False
-
+            return []
         sma1 = talib.SMA(df["close"].astype(float).values, timeperiod=self.period1)
         if self.period2:
             sma2 = talib.SMA(df["close"].astype(float).values, timeperiod=self.period2)
         else:
             sma2 = df["close"].astype(float).values
         ratio = (sma1 - sma2) / sma2 * 100
-
-        flags = [self.min_value <= v <= self.max_value for v in ratio]
-
-        return flags[-days:]
+        return list(ratio)[-days:]

@@ -34,19 +34,15 @@ class PriceChangeIndicator(BaseIndicator):
         return self.min_value <= change <= self.max_value
 
     def screen_range(self, record: StockRecord, days) -> list[bool]:
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_value <= v <= self.max_value for v in values]
 
-        df = record.get_daily_chart_by_days(days+self.days)
+    def calc_series(self, record: StockRecord, days):
+        df = record.get_daily_chart_by_days(days + self.days)
         if df.empty:
-            return False
+            return []
         df = df.sort_index()
         close = df["close"].astype(float).values
-
-        # 現在値と N営業日前の終値
         past = df["close"].shift(self.days).astype(float).values
-
-        # 騰落率（%）
-        # (現在値 - 過去値) / 過去値 × 100
         change = (close - past) / past * 100
-        flags = [self.min_value <= v <= self.max_value for v in change]
-
-        return flags[-days:]
+        return list(change)[-days:]

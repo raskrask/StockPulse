@@ -17,8 +17,6 @@ class ListedStockIndicator(BaseIndicator):
         target_market = params.get("target_market", "ALL")
         target_market = [target_market] if isinstance(target_market, str) else target_market
         self.target_market = ["JP", "US"] if "ALL" in target_market else target_market
-        print(f"ListedStockIndicator target_market: {self.target_market}")
-        print(f"ListedStockIndicator target_market: {params.get('target_market')}")
         self.market = list(market)
         if "JP" in self.target_market: self.market.extend(self.JP_MARKETS)
         if "US" in self.target_market: self.market.extend(self.US_MARKETS)
@@ -28,6 +26,8 @@ class ListedStockIndicator(BaseIndicator):
             return False
         if record.symbol in self.IGNORE_STOKS:
             return False
+        if self._is_equity_like_security(record.name):
+            return False
 
         if not record.market_type in self.target_market:
             return False
@@ -35,4 +35,14 @@ class ListedStockIndicator(BaseIndicator):
         return record.market in self.market
 
     def screen_range(self, record: StockRecord, days) -> list[bool]:
+        values = self._screen_range_with_cache(record, days)
+        return [bool(v) for v in values]
+
+    def calc_series(self, record: StockRecord, days):
         return [self.screen_now(record)] * days
+
+    def _is_equity_like_security(self, name: str) -> bool:
+        return (
+            "社債型種類株式" in name
+            or "優先株" in name
+        )

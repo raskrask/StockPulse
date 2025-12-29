@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from infrastructure.yahoo.yf_fetcher import fetch_yf_daily_by_month, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
-from infrastructure.persistence.indicator_cache import load_indicator_batch, load_indicator_cache_range
+from infrastructure.persistence.indicator_cache import load_cached_indicator_df
 from domain.repository.stock_repository import StockRepository
 
 st.set_page_config(page_title="StockPulse Insight", layout="wide")
@@ -131,7 +131,6 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.write(df)
 
-cache_range = load_indicator_cache_range()
-if cache_range:
-    df_indicator = load_indicator_batch(record.symbol, from_year=cache_range["from_year"], to_year=cache_range["to_year"])
+df_indicator = load_cached_indicator_df(record.symbol)
+if df_indicator is not None:
     st.write(df_indicator.tail())

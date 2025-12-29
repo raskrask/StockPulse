@@ -22,8 +22,12 @@ class IchimokuIndicator(BaseIndicator):
     def screen_range(self, record: StockRecord, days) -> list[bool]:
         if not self.is_active:
             return [True] * days
+        values = self._screen_range_with_cache(record, days)
+        return [bool(v) for v in values]
 
+    def calc_series(self, record: StockRecord, days):
+        if not self.is_active:
+            return [True] * days
         df = record.get_daily_chart_by_days(days+52+10)
         df = IchimokuKintohyo.add_3yakukoten(df)
-
         return df["ichimoku_3yakukoten"].tolist()[-days:]
