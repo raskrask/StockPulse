@@ -29,7 +29,7 @@ class StrategySimulator:
         df = record.get_daily_chart_by_days(self.test_term)
 
         # 購入以降の期間を切り出す
-        buy_window = df[df["date"] > trigger["date"]].reset_index(drop=True)
+        buy_window = df[df["date"] > trigger["date"]].set_index("date", drop=False)
         buy_window = buy_window[:90] # 購入後90日間を対象
         buy_prices = buy_window['close']
 
