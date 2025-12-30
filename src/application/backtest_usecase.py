@@ -5,6 +5,7 @@ from domain.service.backtest.trigger_generator import TriggerGenerator
 from domain.service.backtest.strategy_simulator import StrategySimulator
 from domain.service.backtest.backtest_evalutor import BacktestEvaluator
 from domain.service.progress.progress_reporter import ProgressReporter, NullProgressReporter
+from infrastructure.persistence.backtest_result import save_backtest_result
 from datetime import datetime, timedelta
 
 
@@ -19,7 +20,7 @@ class BacktestUsecase:
         self.strategy_simulator = StrategySimulator(test_term, use_cache=False)
         self.backtest_evaluator = BacktestEvaluator()
 
-    def execute_backtest(self, params: dict) -> list:
+    def execute_backtest(self, params: dict, profile_name: str = "default") -> list:
         """
         指定されたフィルター条件に基づいて銘柄をバックテストする
         """
@@ -50,4 +51,6 @@ class BacktestUsecase:
             print(f"{k:20s} {v:.3f} sec")
         metrics["timer"] = { k: v for k, v in sorted(self.trigger_generator.timer_map.items(), key=lambda x: x[1], reverse=True) }
         
+        if metrics:
+            save_backtest_result(profile_name, metrics)
         return metrics

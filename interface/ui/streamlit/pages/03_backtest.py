@@ -24,6 +24,7 @@ if st.sidebar.button("バックテストを実行"):
     st.success("バックテストが実行されました。")
 
     progress_reporter = StreamlitProgressReporter()
-    results = BacktestUsecase(progress=progress_reporter).execute_backtest(params=filters)
+    profile_name = selected if selected else "custom"
+    results = BacktestUsecase(progress=progress_reporter).execute_backtest(params=filters, profile_name=profile_name)
     if results:
         backtest_results(results)
