@@ -1,10 +1,12 @@
 import streamlit as st
 from datetime import datetime
-from ui.streamlit.components import StreamlitProgressReporter
+from ui.streamlit.components import render_sidemenu, StreamlitProgressReporter
 from application.cache_store_usecase import CacheStoreUsecase
 
 #from infrastructure.cache.cache_store import LocalCacheStore, S3CacheStore
 #from infrastructure.persistence.cache_service import CacheService#, month_range, make_key, CacheConfig
+
+render_sidemenu(current="90_cache_store")
 
 st.set_page_config(page_title="Cache Admin", layout="wide")
 st.title("Cache（取得状況 / リセット）")

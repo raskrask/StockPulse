@@ -1,6 +1,10 @@
 import streamlit as st
 
 st.set_page_config(page_title="StockPulse Dashboard", layout="wide")
+from ui.streamlit.components import render_sidemenu
+from pathlib import Path
+
+render_sidemenu(current="")
 
 """# 個別株 分析ダッシュボード\n
 ### スクリーニング条件\n

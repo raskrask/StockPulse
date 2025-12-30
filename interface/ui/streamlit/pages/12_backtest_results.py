@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 
+from ui.streamlit.components import render_sidemenu
 from infrastructure.persistence.backtest_result import list_backtest_profiles, load_backtest_summary
+
+render_sidemenu(current="12_backtest_results")
 
 st.set_page_config(page_title="Backtest Review", layout="wide")
 st.title("バックテスト評価")

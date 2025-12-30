@@ -1,6 +1,8 @@
 import streamlit as st
-from ui.streamlit.components import screening_filters, set_screening_params, StreamlitProgressReporter
+from ui.streamlit.components import screening_filters, set_screening_params, render_sidemenu
 from application.screening_profile_usecase import ScreeningProfileUsecase
+
+render_sidemenu(current="20_screening_profiles")
 
 st.title("🔔 スクリーニング条件の保存")
 

@@ -1,7 +1,7 @@
 import streamlit as st
 from streamlit.column_config import LinkColumn
 import pandas as pd
-from ui.streamlit.components import screening_filters, set_screening_params, StreamlitProgressReporter
+from ui.streamlit.components import screening_filters, set_screening_params, render_sidemenu, StreamlitProgressReporter
 from application.screening_usecase import ScreeningUsecase
 from application.screening_profile_usecase import ScreeningProfileUsecase
 
@@ -41,3 +41,6 @@ if st.sidebar.button("スクリーニングを実行"):
         }
         st.dataframe( df, column_config=column_config )
         st.write(screen_stocks)
+
+st.sidebar.write("---")
+render_sidemenu(current="21_screening_candidates")

@@ -4,13 +4,16 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 
+from ui.streamlit.components import render_sidemenu
 from infrastructure.yahoo.yf_fetcher import fetch_yf_daily_by_month, fetch_yf_weekly, fetch_yf_monthly, fetch_yf_info
 from infrastructure.jpx.jpx_fetcher import JPXListingFetcher
 from infrastructure.persistence.indicator_cache import load_cached_indicator_df
 from domain.repository.stock_repository import StockRepository
 
-st.set_page_config(page_title="StockPulse Insight", layout="wide")
-st.title("🔍 銘柄詳細")
+render_sidemenu(current="22_stock_insight")
+
+st.set_page_config(page_title="Stock Insight", layout="wide")
+st.title("🔍 銘柄詳細 - Stock Insight")
 
 params = st.query_params
 
