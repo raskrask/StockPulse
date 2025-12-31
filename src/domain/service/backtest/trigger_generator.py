@@ -1,4 +1,5 @@
-from infrastructure.persistence.json_cache import load_backend_trigger, save_backend_trigger
+# from infrastructure.persistence.json_cache import load_backend_trigger, save_backend_trigger
+from infrastructure.persistence.indicator_cache import load_cached_indicator_df
 import pandas as pd
 from datetime import datetime, timedelta
 import time
@@ -15,26 +16,25 @@ class TriggerGenerator:
         フィルター条件に基づいて、売買トリガー（シグナル）を生成する
         test_range: バックテストする期間を指定
         """
-        if self.use_cache and (cached := load_backend_trigger(record.symbol)) is not None:
-            return cached
-
+        cached_df = load_cached_indicator_df(record.symbol) if self.use_cache else None
+        if cached_df is not None:
+            record.set_daily_chart_days_cache(cached_df, force=True)
+        # if self.use_cache and (cached := load_backend_trigger(record.symbol)) is not None:
+        #     return cached
         flags = [True] * self.test_term
-
         for f in filters:
             start = time.perf_counter()
-            current = f.batch_apply(record, self.test_term)
+            current = f.screen_range(record, self.test_term)
             self.timer_map[f.key] += (time.perf_counter() - start)
-
             record.values[f.key] = current
             flags = [(a and b) for a, b in zip(flags, current)]
             if not any(flags):
                 break
-
         if any(flags):
             first_trigger = next((i for i, x in enumerate(flags) if x), None)
             trigger = record.get_daily_chart_by_days(self.test_term).iloc[first_trigger].to_dict()
-            save_backend_trigger(record.symbol, trigger)
+            # save_backend_trigger(record.symbol, trigger)
             return trigger
 
-        save_backend_trigger(record.symbol, {})
+        # save_backend_trigger(record.symbol, {})
         return None

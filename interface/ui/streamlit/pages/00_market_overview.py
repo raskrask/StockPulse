@@ -3,8 +3,9 @@ from datetime import datetime, timedelta
 
 from infrastructure.yahoo.yf_fetcher import fetch_yf_daily_by_month
 from domain.model.analysis.regimes.trend import add_trend, trend_status, is_upward, is_downward
-from ui.streamlit.components import market_card
+from ui.streamlit.components import market_card, render_sidemenu
 
+render_sidemenu(current="00_market_overview")
 
 st.title("🌏 市場概要 - Market Overview")
 

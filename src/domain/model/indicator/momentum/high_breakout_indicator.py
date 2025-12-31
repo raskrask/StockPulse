@@ -16,7 +16,7 @@ class HighBreakoutIndicator(BaseIndicator):
         self.is_active = self.bottom_term != -1
         self.high_term = high_term
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         if not self.is_active:
             return True
 
@@ -41,27 +41,28 @@ class HighBreakoutIndicator(BaseIndicator):
         return (break_max > past_max) and (past_max > bottom_max)
 
 
-    def batch_apply(self, record, days: int) -> list[bool]:
+    def screen_range(self, record, days: int) -> list[bool]:
         if not self.is_active:
             return [True] * days
+        values = self._screen_range_with_cache(record, days)
+        return [bool(v) for v in values]
 
-        df = record.get_daily_chart_by_days( days + self.high_term )
+    def calc_series(self, record, days: int):
+        if not self.is_active:
+            return [True] * days
+        df = record.get_daily_chart_by_days(days + self.high_term)
         if df is None or df.empty:
             return [False] * days
-
         highs = df["high"]
         past_max = highs.shift(self.bottom_term + 1).rolling(self.high_term - self.bottom_term + 1).max()
         if self.break_term == -1:
             bottom_max = highs.rolling(self.bottom_term + 1).max()
-            flags = (past_max > bottom_max) 
-
+            flags = (past_max > bottom_max)
         elif self.break_term == self.bottom_term:
             break_max = highs.rolling(self.break_term + 1).max()
-            flags = (break_max > past_max) 
-
+            flags = (break_max > past_max)
         else:
             bottom_max = highs.shift(self.break_term + 1).rolling(self.bottom_term - self.break_term + 1).max()
             break_max = highs.rolling(self.break_term + 1).max()
             flags = (break_max > past_max) & (past_max > bottom_max)
-
-        return flags.iloc[-days:].fillna(False).to_numpy()
+        return flags.iloc[-days:].fillna(False).to_list()

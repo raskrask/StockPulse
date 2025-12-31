@@ -14,21 +14,20 @@ class StockRepository:
         chart_repo = ChartRepository()
         target_market = params.get("target_market")
 
-        if target_market == "US":
-            us_listings = USListingFetcher().fetch_listings()
-            stocks = [StockRecord(row, self, chart_repo) for row in us_listings]
-            import infrastructure.util.debug as debug
-
-        else:
+        stocks = []
+        if target_market in (None, "JP", "ALL"):
             jpx = JPXListingFetcher()
             sheet = jpx.fetch_workbook().sheet_by_index(0)
             total = sheet.nrows-1
-            stocks = [StockRecord(sheet.row(i+1), self, chart_repo) for i in range(total)]
+            stocks.extend([StockRecord(sheet.row(i+1), self, chart_repo) for i in range(total)])
+        if target_market in (None, "US", "ALL"):
+            us_listings = USListingFetcher().fetch_listings()
+            stocks.extend([StockRecord(row, self, chart_repo) for row in us_listings])
 
         #stocks = stocks[1040:1140]  # テスト用に行数を減らす
         fitlers = ScreenBuilder().build_default_indicators(params)
         for f in fitlers:
-            stocks = [s for s in stocks if f.apply(s)]
+            stocks = [s for s in stocks if f.screen_now(s)]
 
         return stocks
     

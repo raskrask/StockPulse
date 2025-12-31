@@ -16,7 +16,7 @@ class YtdDivergenceIndicator(BaseIndicator):
         self.max_value = divergence_range[1]
         self.type = type
 
-    def apply(self, record: StockRecord) -> bool:
+    def screen_now(self, record: StockRecord) -> bool:
         # 暫定決算発表日取得(未来の場合には四半期強制的に戻す)
         #info = fetch_yf_info(record.symbol)
         #target = datetime.fromtimestamp( info['earningsTimestampEnd'] )
@@ -55,29 +55,27 @@ class YtdDivergenceIndicator(BaseIndicator):
         # 乖離率（%）
         return self.min_value <= ytd_div <= self.max_value
 
-    def batch_apply(self, record: StockRecord, days) -> list[bool]:
-        target = (datetime.today() - timedelta(days=days)).replace(month=1, day=1)
-        if target.month <= 3:
-            target = target.replace(year=target.year - 1)
+    def screen_range(self, record: StockRecord, days) -> list[bool]:
+        values = self._screen_range_with_cache(record, days)
+        return [self.min_value <= v <= self.max_value for v in values]
 
-        df = record.get_daily_chart(target, datetime.today())
+    def calc_series(self, record: StockRecord, days):
+        df = record.get_daily_chart_by_days(days)
+        if df is None or df.empty:
+            return []
         close = df["close"].astype(float).values
-
-        flags = []
+        values = []
         for i in range(len(df)):
             date = df.iloc[i]["date"]
             year_start = date.replace(month=1, day=1)
             if date.month <= 3:
                 year_start = year_start.replace(year=year_start.year - 1)
             df_ytd = df[(df["date"] >= year_start) & (df["date"] <= date)]
-
             if self.type == "high":
                 ytd = np.max(df_ytd["high"].astype(float).values)
                 ytd_div = (close[i] - ytd) / ytd * 100
             else:
                 ytd = np.min(df_ytd["low"].astype(float).values)
                 ytd_div = (close[i] - ytd) / ytd * 100
-
-            flags.append( self.min_value <= ytd_div <= self.max_value )
-
-        return flags[-days:]
+            values.append(ytd_div)
+        return values[-days:]
