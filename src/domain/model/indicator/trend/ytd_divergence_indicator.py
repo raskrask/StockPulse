@@ -30,7 +30,7 @@ class YtdDivergenceIndicator(BaseIndicator):
         if datetime.today().month <= 3:
             target = target.replace(year=target.year - 1)
 
-        df = record.recent_yf_yearly((datetime.today() - target).days)
+        df = record.get_daily_chart_by_days((datetime.today() - target).days)
         if df.empty:
             return False
 

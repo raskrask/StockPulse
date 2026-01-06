@@ -13,7 +13,7 @@ class UenoTheoryIndicator(BaseIndicator):
         if not self.is_active:
             return True
 
-        df = record.recent_yf_yearly()
+        df = record.get_daily_chart_by_days(self.logic.window_size+10)
         df = self.logic.add_ueno_theory_signal(df)
 
         record.values[self.key] = df[["is_high_volume", "ueno_theory_signal"]].iloc[-1]

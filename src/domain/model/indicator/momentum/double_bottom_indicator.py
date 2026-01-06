@@ -12,7 +12,7 @@ class DoubleBottomIndicator(BaseIndicator):
         if not self.is_active:
             return True
 
-        df = record.recent_yf_yearly()
+        df = record.get_daily_chart_by_days(26 + 5)
         signal = DoubleBottom.compute_double_bottom_signal(df)
         record.values[self.key] = signal
 
@@ -27,7 +27,7 @@ class DoubleBottomIndicator(BaseIndicator):
     def calc_series(self, record: StockRecord, days):
         if not self.is_active:
             return [True] * days
-        df = record.recent_yf_yearly(days+26+5) # 追加の期間を確保
+        df = record.get_daily_chart_by_days(days+26+5) # 追加の期間を確保
         result = []
         for i in range(days):
             sub_df = df.iloc[i:i+26+5]

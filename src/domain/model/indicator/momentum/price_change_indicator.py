@@ -16,7 +16,7 @@ class PriceChangeIndicator(BaseIndicator):
         self.days = days
 
     def screen_now(self, record: StockRecord) -> bool:
-        df = record.recent_yf_yearly()
+        df = record.get_daily_chart_by_days(self.days + 1)
         if df.empty:
             return False
         df = df.sort_index()

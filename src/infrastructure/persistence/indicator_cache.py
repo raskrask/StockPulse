@@ -27,11 +27,11 @@ def save_indicator_cache_range(from_year: int, to_year: int):
         "to_year": to_year,
         "generated_at": datetime.utcnow().isoformat(),
     }
-    io_utils.save_json("indicator_cache_range.json", payload)
+    io_utils.save_json("state/indicator_cache_range.json", payload)
 
 
 def load_indicator_cache_range() -> dict | None:
-    return io_utils.load_json("indicator_cache_range.json")
+    return io_utils.load_json("state/indicator_cache_range.json")
 
 
 def load_cached_indicator_df(symbol: str):

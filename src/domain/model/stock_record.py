@@ -25,9 +25,6 @@ class StockRecord:
         self.info = None  # 銘柄情報キャッシュ
         self.values = {}
 
-        self.yf_daily = None  # キャッシュ用
-        self.yf_yearly = None  # キャッシュ用
-
         self._memory_cache = None
         self._memory_range = None
 
@@ -40,7 +37,7 @@ class StockRecord:
             "symbol": self.symbol, 
             "name": self.name,
             "market": self.market,
-            "close": self.yf_daily["close"].iloc[-1] if self.yf_daily is not None and not self.yf_daily.empty else None,
+            "close": self._memory_cache["close"].iloc[-1] if self._memory_cache is not None and not self._memory_cache.empty else None,
             "rsi": self.values.get("rsi"),
             **self.values
         }
@@ -84,7 +81,7 @@ class StockRecord:
 
         # Repositoryから取得（キャッシュ or Yahoo ）
         today = datetime.today()
-        approx_days = days * 1.5 # 休日を考慮したバッファ
+        approx_days = max(days,31) * 1.5 # 休日を考慮したバッファ
 
         from_date = today - timedelta(days=approx_days)
         from_date = max(from_date, self.get_stock_first_trade_date())
@@ -126,20 +123,3 @@ class StockRecord:
 
     def get_cached_daily_chart(self):
         return self._memory_cache_days
-
-    def recent_yf_monthly(self):
-        if self.yf_daily is not None:
-            return self.yf_daily
-
-        start = datetime.today() - timedelta(days=31*2)
-        self.yf_daily = self.chart_repo.load_daily_by_month(self.symbol, start)
-
-        return self.yf_daily
-
-    def recent_yf_yearly(self, days=366):
-        if self.yf_yearly is not None and len(self.yf_yearly) >= days:
-            return self.yf_yearly[-days:]
-
-        start = datetime.today() - timedelta(days=days)
-        self.yf_yearly = self.chart_repo.load_daily_range(self.symbol, start, datetime.today())
-        return self.yf_yearly[-days:]
