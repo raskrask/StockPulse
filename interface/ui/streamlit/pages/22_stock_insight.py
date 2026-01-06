@@ -131,6 +131,47 @@ fig.update_layout(title="出来高", xaxis_rangeslider_visible=False)
 
 st.plotly_chart(fig, use_container_width=True)
 
+st.write("---")
+st.subheader("📰 関連ニュース")
+
+try:
+    from infrastructure.google.google_news_fetcher import fetch_google_news_rss
+    
+    # Use stock name for searching
+    search_query = f"{record.name}"
+    news_items = fetch_google_news_rss(search_query)
+
+    if not news_items:
+        st.info("関連ニュースが見つかりませんでした。")
+    else:
+        # Create 2 columns for card layout
+        n_cols = 2
+        cols = st.columns(n_cols)
+        
+        for i, item in enumerate(news_items):
+            col = cols[i % n_cols]
+            with col:
+                # Using HTML for card styling
+                st.markdown(f"""
+                <div style="border: 1px solid #bbb; padding: 15px; border-radius: 8px; margin-bottom: 20px; height: 100%;">
+                    <h5 style="margin-bottom: 5px; font-size: 16px;"><a href="{item['link']}" target="_blank" style="text-decoration: none;">{item['title']}</a></h5>
+                    <div style="font-size: 12px; color: gray; margin-bottom: 10px;">{item['published']} | {item['source']}</div>
+                    <div style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">{item['summary']}</div>
+                    <a href="{item['link']}" target="_blank" style="
+                        display: inline-block; 
+                        padding: 5px 12px; 
+                        background-color: #4CAF50; 
+                        color: white; 
+                        text-decoration: none; 
+                        border-radius: 4px; 
+                        font-size: 12px;">元記事へ</a>
+                </div>
+                """, unsafe_allow_html=True)
+
+except Exception as e:
+    st.error(f"ニュースの取得に失敗しました: {e}")
+
+
 
 st.write(df)
 

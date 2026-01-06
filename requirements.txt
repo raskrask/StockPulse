@@ -13,3 +13,4 @@ xlrd
 dotenv
 jpholiday
 marimo
+feedparser
