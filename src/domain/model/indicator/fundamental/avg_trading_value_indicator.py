@@ -6,12 +6,11 @@ class AvgTradingValueIndicator(BaseIndicator):
         super().__init__(key)
         self.min_value = value[0]
         self.max_value = value[1]
+        self.window = 20  # 20日移動平均
 
     def screen_now(self, record: StockRecord) -> bool:
-        df = record.recent_yf_monthly()
-        if df is None or df.empty:   
-            return False
-        trading_value = ((df['close'] * df['volume']).rolling(20).mean()).iloc[-1]
+        values = self._screen_range_with_cache(record, self.window)
+        trading_value = values[-1]
         record.values[self.key] = [trading_value, self.min_value, self.max_value]
 
         return self.min_value <= trading_value <= self.max_value
@@ -21,8 +20,8 @@ class AvgTradingValueIndicator(BaseIndicator):
         return [self.min_value <= v <= self.max_value for v in values]
 
     def calc_series(self, record: StockRecord, days):
-        df = record.get_daily_chart_by_days(days + 20)
+        df = record.get_daily_chart_by_days(days + self.window)
         if df is None or df.empty:
             return []
-        trading_value = ((df['close'] * df['volume']).rolling(20).mean())
+        trading_value = ((df['close'] * df['volume']).rolling(self.window).mean())
         return trading_value.tolist()[-days:]

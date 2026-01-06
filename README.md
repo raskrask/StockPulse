@@ -68,6 +68,7 @@ http://localhost:8501/
 - cache/ : ローカルデータ保存
 - trades.csv : 売買履歴
 
-
 ---
-詳細はcopilot-instructions.md参照
+### TODO
+- スクレイピング条件のオプティマイザ
+- 機械学習による購入株候補の選定

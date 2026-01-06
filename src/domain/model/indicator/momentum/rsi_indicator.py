@@ -12,7 +12,7 @@ class RsiIndicator(BaseIndicator):
         self.max_value = value[1]
 
     def screen_now(self, record: StockRecord) -> bool:
-        df = record.recent_yf_yearly()
+        df = record.get_daily_chart_by_days(14*2)
         df.sort_index(inplace=True)
         target = datetime.today() - timedelta(days=14*2)
         period = len(df[df["date"] >= target]) # 休場日レコードを除いた期間

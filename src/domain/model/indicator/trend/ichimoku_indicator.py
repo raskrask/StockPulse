@@ -12,7 +12,7 @@ class IchimokuIndicator(BaseIndicator):
         if not self.is_active:
             return True
 
-        df = record.recent_yf_yearly()
+        df = record.get_daily_chart_by_days(52+10)
         df = IchimokuKintohyo.add_3yakukoten(df)
 
         record.values[self.key] = df["ichimoku_3yakukoten"].iloc[-1]
