@@ -202,10 +202,11 @@ def fetch_yf_daily_OLD(
         if df_yahoo.empty:
             continue
 
+        df_yahoo = _normalize_yf(df_yahoo)
+
         path = io_util.get_daily_month_cache_path(symbol, df_yahoo["date"].iloc[0])
         io_util.save_parquet(path, df_yahoo)
 
-        df_yahoo = _normalize_yf(df_yahoo)
         df_all = pd.concat([df_all, df_yahoo], ignore_index=True)
 
     # 先月まで保存
