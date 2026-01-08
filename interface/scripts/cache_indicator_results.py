@@ -5,13 +5,7 @@ import sys
 sys.path.append(str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
 from application.indicator_cache_usecase import IndicatorCacheUsecase
-from domain.service.progress.progress_reporter import ProgressReporter
-
-
-class ConsoleProgressReporter(ProgressReporter):
-    def report(self, progress, text: str = ""):
-        if text:
-            print(text)
+from domain.service.progress.console_progress_reporter import ConsoleProgressReporter
 
 
 def main():

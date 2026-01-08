@@ -21,4 +21,6 @@ for name in profiles:
         rows.append(summary)
 
 df = pd.DataFrame(rows)
+if "win_rate" in df.columns:
+    df = df.sort_values(by="win_rate", ascending=False)
 st.dataframe(df, use_container_width=True)
