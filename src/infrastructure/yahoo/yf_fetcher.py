@@ -192,13 +192,16 @@ def fetch_yf_daily_OLD(
         if s > e:
             continue
 
-        df_yahoo = yf.download(
-            symbol,
-            start=s,
-            end=e + timedelta(days=1),
-            progress=False,
-            auto_adjust=True,
-        )
+        try:    
+            df_yahoo = yf.download(
+                symbol,
+                start=s,
+                end=e + timedelta(days=1),
+                progress=False,
+                auto_adjust=True,
+            )
+        except Exception:
+            continue
         if df_yahoo.empty:
             continue
 

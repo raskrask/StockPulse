@@ -96,3 +96,8 @@ def render_sidemenu(current: str | None = None):
             label="キャッシュ管理",
             disabled=(current == "90_cache_store"),
         )
+        st.page_link(
+            "pages/91_trading_gym.py",
+            label="トレーディングジム",
+            disabled=(current == "91_trading_gym"),
+        )
